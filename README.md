@@ -84,6 +84,27 @@ docker ps
 docker exec -it postgres-db psql -U myuser -d myowndatabase
 ```
 
+- Si prefiere hacer uso de un GUI para interactuar con la base de datos, puede utilizar **pgAdmin**. Para instalar la imagen debe correr el siguiente comando:
+
+```bash
+docker pull dpage/pgadmin4
+```
+
+- Una vez instalada la imagen, puede ejecutar un contenedor de la siguiente manera:
+
+```bash
+# Crea un contenedor usando la imagen dpage/pgAdmin4
+# --name: Este parámetro le asigna un nombre al contenedor
+# -p: Este parámetro mapea los puertos por los que se va a exponer la aplicacion PuertoLocal:PuertoContenedor
+# -e PGADMIN_DEFAULT_EMAIL: correo con el cual se realiza el login
+# -e PGADMIN_DEFAULT_PASSWORD: contraseña para el acceso a pgAdmin
+# -d: ejecución en modo detach
+
+docker run --name pgadmin -p 5050:80 -e PGADMIN_DEFAULT_EMAIL=user@domain.com -e PGADMIN_DEFAULT_PASSWORD=mysecretpassword -d dpage/pgadmin4
+```
+
+- Cuando este corriendo el contenedor, podrá acceder a *localhost:5050* para tener el control de la base de datos.
+
 ---
 
 ## Objetivos
@@ -111,6 +132,3 @@ Los objetivos especificos pautados para el desarrollo de este proyecto son:
 - Aplicar pruebas unitarias y un pipeline de despliegue donde se ejecuten de manera automática con la ayuda de Github Actions.
 - Fortalecer los conceptos aprendidos en arquitectura vertical aplicandolos en el desarrollo backend.
 - Fortalecer conceptos aprendidos para bases de datos PostgreSQL y MongoDB mediante un buen diseño de bases de datos
-
----
-
