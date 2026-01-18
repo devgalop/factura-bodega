@@ -6,7 +6,7 @@ Este es un proyecto de estudio, que busca afianzar conceptos y tecnologías apre
 
 ## Arquitectura
 
-El sistema está pensado para ser un **Monolito Modular**. Dentro del código busco aplicar lo aprendido en el estilo de **Arquitectura Vertical**
+El sistema está pensado para ser un **Monolito Modular**. El sistema se desarrolla en .NET con un estilo de *arquitectura vertical*.
 
 ### Contexto
 
@@ -19,3 +19,42 @@ El sistema está pensado para ser un **Monolito Modular**. Dentro del código bu
 ### Componentes
 
 ![diagrama_componentes](/resources/C4_sistema_facturacion-Componentes.drawio.png)
+
+---
+
+## Tecnologías
+
+Las tecnologías aplicadas en este proyecto son:
+
+- .Net 9
+- PostgreSQL
+- MongoDB
+- Docker
+
+---
+
+## Objetivos
+
+### General
+
+El objetivo de este proyecto es aplicar los conceptos aprendidos en temas como:
+
+- API Security
+- API Documentation
+- Unit Test
+- Vertical Slice Architecture
+- PostgreSQL
+- MongoDB
+- Manejo de contenedores
+
+Todo esto utilizando las tecnologías mencionadas anteriormente.
+
+### Especificos
+
+Los objetivos especificos pautados para el desarrollo de este proyecto son:
+
+- Crear un backend seguro utilizando JWT Tokens y autorización por roles.
+- Generar APIs bien documentadas haciendo uso de OpenAPI y documentación interna del código.
+- Aplicar pruebas unitarias y un pipeline de despliegue donde se ejecuten de manera automática con la ayuda de Github Actions.
+- Fortalecer los conceptos aprendidos en arquitectura vertical aplicandolos en el desarrollo backend.
+- Fortalecer conceptos aprendidos para bases de datos PostgreSQL y MongoDB mediante un buen diseño de bases de datos
