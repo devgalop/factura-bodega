@@ -1,0 +1,6 @@
+@devgalop.facturabodega.webapi_HostAddress = http://localhost:5232
+
+GET {{devgalop.facturabodega.webapi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
