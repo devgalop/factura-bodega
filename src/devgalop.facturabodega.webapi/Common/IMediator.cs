@@ -39,3 +39,18 @@ public class Mediator(IServiceProvider serviceProvider) : IMediator
         await handler.HandleAsync(command);
     }
 }
+
+public static class MediatorExtensions
+{
+    /// <summary>
+    /// Registra el mediador en los servicios de la aplicación.
+    /// </summary>
+    /// <param name="services">servicios de aplicación</param>
+    /// <returns></returns>
+    public static WebApplicationBuilder AddMediator(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddScoped<IMediator, Mediator>();
+        return builder;
+    }
+}
+

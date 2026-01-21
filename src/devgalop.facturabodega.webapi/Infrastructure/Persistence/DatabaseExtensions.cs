@@ -6,21 +6,28 @@ using Microsoft.EntityFrameworkCore;
 
 namespace devgalop.facturabodega.webapi.Infrastructure.Persistence
 {
-    public static class DependencyInjection
+    public static class DatabaseExtensions
     {
         /// <summary>
         /// Agrega el contexto de la base de datos a los servicios de la aplicación.
         /// </summary>
         /// <param name="builder">builder de aplicación</param>
-        public static void AddDatabaseContext(this WebApplicationBuilder builder)
+        public static WebApplicationBuilder AddDatabaseContext(this WebApplicationBuilder builder)
         {
             builder.Services.AddDbContext<AppDatabaseContext>(options =>
             {
                 var connectionString = builder.Configuration.GetConnectionString("Postgres");
                 options.UseNpgsql(connectionString);
             });
+            return builder;
         }
 
+
+        /// <summary>
+        /// Verifica la conexión a la base de datos y registra el resultado en los logs.
+        /// </summary>
+        /// <param name="app">aplicación web</param>
+        /// <returns></returns>
         public static async Task EnsureDatabaseCanConnectAsync(this WebApplication app)
         {
             await using var scope = app.Services.CreateAsyncScope();

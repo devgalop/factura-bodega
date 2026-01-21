@@ -1,3 +1,6 @@
+
+using devgalop.facturabodega.webapi.Common;
+using devgalop.facturabodega.webapi.Features.Users.Employees.Common;
 using devgalop.facturabodega.webapi.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,7 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddOpenApi();
-builder.AddDatabaseContext();
+
+builder.AddDatabaseContext()
+        .AddMediator()
+        .AddExceptionHandlers();
 
 var app = builder.Build();
 
@@ -19,6 +25,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
 
 var summaries = new[]
