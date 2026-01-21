@@ -27,6 +27,7 @@ El sistema está pensado para ser un **Monolito Modular**. El sistema se desarro
 Las tecnologías aplicadas en este proyecto son:
 
 - [.Net 9](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)
+- Entity Framework
 - PostgreSQL
 - MongoDB
 - [Docker](https://www.docker.com/get-started/)
@@ -104,6 +105,24 @@ docker run --name pgadmin -p 5050:80 -e PGADMIN_DEFAULT_EMAIL=user@domain.com -e
 ```
 
 - Cuando este corriendo el contenedor, podrá acceder a *localhost:5050* para tener el control de la base de datos.
+
+### ¿Cómo instalar EntityFramework CLI?
+
+- Lo primero que debes hacer es validar si tienes instaldo el componente de CLI para Entity Framework
+
+```bash
+dotnet ef
+```
+
+- Si la ejecución de ese comando te genera algún tipo de error, debes ejecutar lo siguiente:
+
+```bash
+# Si quieres instalar de forma global para todos los proyectos (Recomendado)
+dotnet tool install --global dotnet-ef
+
+# Si quieres solo instalar la herramienta en el proyecto local
+dotnet tool install dotnet-ef
+```
 
 ---
 
