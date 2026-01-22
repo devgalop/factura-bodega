@@ -45,7 +45,7 @@ public static class MediatorExtensions
     /// <summary>
     /// Registra el mediador en los servicios de la aplicación.
     /// </summary>
-    /// <param name="services">servicios de aplicación</param>
+    /// <param name="builder">builder de aplicación</param>
     /// <returns></returns>
     public static WebApplicationBuilder AddMediator(this WebApplicationBuilder builder)
     {

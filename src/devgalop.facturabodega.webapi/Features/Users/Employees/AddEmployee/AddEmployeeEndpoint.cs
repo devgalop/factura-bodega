@@ -9,10 +9,19 @@ using FluentValidation.Results;
 
 namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
 {
-    public record AddEmployeeRequest(string Name,
-                                     string Email,
-                                     DateTime HiringDate,
-                                     string ContractType);
+    /// <summary>
+    /// Solicitud para agregar un nuevo empleado.
+    /// </summary>
+    /// <param name="Name">Nombre del empleado</param>
+    /// <param name="Email">Correo del empleado</param>
+    /// <param name="HiringDate">Fecha de contratación. No puede ser futura</param>
+    /// <param name="ContractType">Tipo de contrato. (FULL_TIME, PART_TIME, CONTRACTOR)</param>
+    public record AddEmployeeRequest(
+        string Name,
+        string Email,
+        DateTime HiringDate,
+        string ContractType
+    );
     
     public class AddEmployeeEndpoint : IEndpoint
     {
@@ -42,8 +51,20 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
                     Enum.Parse<EmployeeContractType>(request.ContractType)
                 ));
                 
-                return Results.Ok("Empleado agregado exitosamente.");
-            });
+                return Results.StatusCode(StatusCodes.Status201Created);
+            })
+            .WithName("AddEmployee")
+            .WithSummary("Agregar Empleado")
+            .WithDescription("""
+                Agrega un nuevo empleado al sistema con la información proporcionada.
+                - `Name`: Nombre completo del empleado.
+                - `Email`: Correo electrónico del empleado. 
+                - `HiringDate`: Fecha de contratación del empleado (no puede ser futura).
+                - `ContractType`: Tipo de contrato del empleado (por ejemplo, 'FULL_TIME', 'PART_TIME', 'CONTRACTOR').
+            """)
+            .Produces(StatusCodes.Status201Created)
+            .ProducesValidationProblem()
+            .WithTags("Employees");
         }
     }
 
@@ -72,6 +93,4 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
             return date <= DateTime.UtcNow;
         }
     }
-
-    
 }

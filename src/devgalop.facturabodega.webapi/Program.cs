@@ -3,6 +3,7 @@ using devgalop.facturabodega.webapi.Common;
 using devgalop.facturabodega.webapi.Features.Users.Employees.Common;
 using devgalop.facturabodega.webapi.Infrastructure.Persistence;
 using FluentValidation;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,14 @@ await app.EnsureDatabaseCanConnectAsync();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference("/docs",options =>
+    {
+        options.Title = "API Sitema de facturación y gestión de bodega";
+        options.WithOpenApiRoutePattern("/openapi/v1.json");
+        options.WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+        options.DarkMode = true;
+    });
+    app.MapGet("/", () => Results.Redirect("/docs"));
     await app.ApplyMigrationsAsync();
     await app.SeedDatabaseAsync();
 }
