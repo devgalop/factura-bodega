@@ -4,20 +4,32 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:9.0.310-alpine3.22-amd64 AS build
 WORKDIR /src
 
-COPY . /src/
+# Copia solo el archivo del proyecto a la ruta de trabajo
+COPY devgalop.facturabodega.webapi.csproj ./
 
+# Restaura las dependencias del proyecto
 RUN dotnet restore "./devgalop.facturabodega.webapi.csproj"
 
+# Copia el resto del código fuente
 COPY . .
+
+# Establece el directorio de trabajo
 WORKDIR /src/.
 
+# Compila el proyecto en modo Release
 RUN dotnet build "devgalop.facturabodega.webapi.csproj" -c Release -o /app/build
 
 FROM build AS publish
 
+# Publica la aplicación
 RUN dotnet publish "devgalop.facturabodega.webapi.csproj" -c Release -o /app/publish
-# Build runtime image
+
+
 FROM base AS final
+# Establece el directorio de trabajo /app
 WORKDIR /app
+# Copia los archivos publicados desde la etapa de publicación
 COPY --from=publish /app/publish .
+
+# Define el punto de entrada para la aplicación
 ENTRYPOINT ["dotnet", "devgalop.facturabodega.webapi.dll"]
