@@ -101,6 +101,7 @@ namespace devgalop.facturabodega.webapi.Infrastructure.Persistence
                 if (await appContext.Employees.AnyAsync() || await appContext.Roles.AnyAsync() || await appContext.Permissions.AnyAsync())
                 {
                     app.Logger.LogInformation("La base de datos ya contiene datos. No se realizará el sembrado inicial.");
+                    await transaction.RollbackAsync(); // Cerrar la transacción si no se realizan cambios
                     return;
                 }
 
