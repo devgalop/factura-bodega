@@ -124,6 +124,64 @@ dotnet tool install --global dotnet-ef
 dotnet tool install dotnet-ef
 ```
 
+### ¿Cómo crear una imagen del proyecto con Docker?
+
+Para crear una imagen de docker del proyecto .NET, es necesario lo siguiente:
+
+- Dentro del la carpeta del proyecto, se debe crear un archivo llamado Dockerfile.
+
+```bash
+# Debes reemplazar el ASPNET_VERSION por la versión del ASPNET que desees. Esta información la puedes tomar de Dockerhub
+FROM mcr.microsoft.com/dotnet/aspnet:ASPNET_VERSION AS base
+WORKDIR /app
+
+# INICIA ETAPA DE CONSTRUCCION DEL PROYECTO (BUILD)
+# Debes reemplazar el SDK_VERSION por la versión del sdk que desees. Esta información la puedes tomar de Dockerhub
+# Recuerda reemplazar tu-proyecto.csproj por el nombre real de tu proyecto
+
+FROM mcr.microsoft.com/dotnet/sdk:SDK_VERSION AS build
+WORKDIR /src
+
+# Copia solo el archivo del proyecto a la ruta de trabajo
+COPY tu-proyecto.csproj ./
+
+# Restaura las dependencias del proyecto
+RUN dotnet restore "./tu-proyecto.csproj"
+
+# Copia el resto del código fuente
+COPY . .
+
+# Establece el directorio de trabajo
+WORKDIR /src/.
+
+# Compila el proyecto en modo Release
+RUN dotnet build "tu-proyecto.csproj" -c Release -o /app/build
+
+FROM build AS publish
+
+# Publica la aplicación
+RUN dotnet publish "tu-proyecto.csproj" -c Release -o /app/publish
+
+
+FROM base AS final
+# Establece el directorio de trabajo /app
+WORKDIR /app
+# Copia los archivos publicados desde la etapa de publicación
+COPY --from=publish /app/publish .
+
+# Define el punto de entrada para la aplicación
+ENTRYPOINT ["dotnet", "tu-proyecto.dll"]
+```
+
+- Una vez creado el archivo Dockerfile, debe ubicarse en la carpeta principal del proyecto, luego de esto necesitará correr el siguiente comando:
+
+```bash
+# Crea la imagen de tu proyecto basandose en el archivo Dockerfile
+# -t: El tag con el que identificaras a tu imagen. Se compone del nombre_imagen : version_imagen. La versión por defecto es latest
+# -f: Ruta donde está el archivo Dockerfile
+docker build -t tuproyecto:version -f Dockerfile .
+```
+
 ---
 
 ## Objetivos
