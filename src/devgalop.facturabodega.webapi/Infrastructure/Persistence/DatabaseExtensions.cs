@@ -95,27 +95,45 @@ namespace devgalop.facturabodega.webapi.Infrastructure.Persistence
             using IServiceScope scope = app.Services.CreateScope();
             await using AppDatabaseContext appContext =
                 scope.ServiceProvider.GetRequiredService<AppDatabaseContext>();
-
+            using var transaction = await appContext.Database.BeginTransactionAsync();
             try
             {
-                if(await appContext.Employees.AnyAsync())
+                if (await appContext.Employees.AnyAsync() || await appContext.Roles.AnyAsync() || await appContext.Permissions.AnyAsync())
                 {
                     app.Logger.LogInformation("La base de datos ya contiene datos. No se realizará el sembrado inicial.");
                     return;
                 }
+
+                // Crear permiso inicial
+                PermissionEntity permissionEntity = new("ALL");
+                await appContext.Permissions.AddAsync(permissionEntity);
+
+                // Crear rol inicial y asociar permiso
+                RoleEntity adminRole = new("ADMIN");
+                adminRole.Permissions.Add(permissionEntity);
+                await appContext.Roles.AddAsync(adminRole);
+                await appContext.SaveChangesAsync(); // Guardar para generar el ID del rol
+
+                // Crear empleado inicial y asociar rol
                 EmployeeEntity initialEmployee = new(
                     name: "Juan Pérez",
                     email: "jperez@yopmail.com",
                     hiringDate: DateTime.UtcNow.AddYears(-1),
-                    contractType: EmployeeContractType.FULL_TIME
+                    contractType: EmployeeContractType.FULL_TIME,
+                    passwordHashed: "hashed_password_example",
+                    roleId: adminRole.Id
                 );
                 await appContext.Employees.AddAsync(initialEmployee);
+
+                // Guardar cambios y confirmar transacción
                 await appContext.SaveChangesAsync();
+                await transaction.CommitAsync();
 
                 app.Logger.LogInformation("Se insertaron los datos iniciales en la base de datos correctamente.");
             }
             catch (Exception e)
             {
+                await transaction.RollbackAsync();
                 app.Logger.LogError(e, "Ocurrió un error al sembrar los datos iniciales en la base de datos.");
                 throw;
             }

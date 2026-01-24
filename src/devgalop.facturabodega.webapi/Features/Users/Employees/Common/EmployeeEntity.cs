@@ -32,22 +32,39 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
         public Guid Id { get; set; }
         public string Name { get; private set; }
         public string Email { get; private set; }
+        public string PasswordHashed { get; set; }
         public DateTime HiringDate { get; private set; }
         public EmployeeContractType ContractType { get; private set; }
         public EmployeeStatus Status { get; set; }
 
+        
+        public Guid RoleId { get; set; }
+        public RoleEntity Role { get; set; }
+
+        private EmployeeEntity()
+        {
+            Name = string.Empty;
+            Email = string.Empty;
+            PasswordHashed = string.Empty;
+            Role = null!;
+        }
 
         public EmployeeEntity(string name, 
-                              string email, 
+                              string email,
+                              string passwordHashed, 
                               DateTime hiringDate, 
-                              EmployeeContractType contractType)
+                              EmployeeContractType contractType,
+                              Guid roleId)
         {
             Id = Guid.NewGuid();
             Name = name;
             Email = email;
+            PasswordHashed = passwordHashed;
             HiringDate = hiringDate.ToUniversalTime();
             ContractType = contractType;
             Status = EmployeeStatus.ACTIVE;
+            RoleId = roleId;
+            Role = null!;
         }
 
         /// <summary>
