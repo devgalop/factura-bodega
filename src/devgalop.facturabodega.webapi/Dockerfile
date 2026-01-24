@@ -5,13 +5,13 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0.310-alpine3.22-amd64 AS build
 WORKDIR /src
 
 # Copia solo el archivo del proyecto a la ruta de trabajo
-COPY devgalop.facturabodega.webapi.csproj ./
+COPY src/devgalop.facturabodega.webapi/devgalop.facturabodega.webapi.csproj ./
 
 # Restaura las dependencias del proyecto
 RUN dotnet restore "./devgalop.facturabodega.webapi.csproj"
 
 # Copia el resto del código fuente
-COPY . .
+COPY src/devgalop.facturabodega.webapi/ .
 
 # Establece el directorio de trabajo
 WORKDIR /src/.
