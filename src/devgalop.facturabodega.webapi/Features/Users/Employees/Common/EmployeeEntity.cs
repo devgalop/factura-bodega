@@ -54,7 +54,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
                               string passwordHashed, 
                               DateTime hiringDate, 
                               EmployeeContractType contractType,
-                              Guid roleId)
+                              RoleEntity role)
         {
             Id = Guid.NewGuid();
             Name = name;
@@ -63,8 +63,8 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
             HiringDate = hiringDate.ToUniversalTime();
             ContractType = contractType;
             Status = EmployeeStatus.ACTIVE;
-            RoleId = roleId;
-            Role = null!;
+            RoleId = role.Id;
+            Role = role;
         }
 
         /// <summary>

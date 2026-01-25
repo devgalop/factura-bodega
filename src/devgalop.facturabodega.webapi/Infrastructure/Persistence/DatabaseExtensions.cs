@@ -106,13 +106,19 @@ namespace devgalop.facturabodega.webapi.Infrastructure.Persistence
                 }
 
                 // Crear permiso inicial
-                PermissionEntity permissionEntity = new("ALL");
-                await appContext.Permissions.AddAsync(permissionEntity);
+                PermissionEntity adminPermission = new("ALL");
+                await appContext.Permissions.AddAsync(adminPermission);
+                PermissionEntity basicPermission = new("BASIC");
+                await appContext.Permissions.AddAsync(basicPermission);
 
                 // Crear rol inicial y asociar permiso
                 RoleEntity adminRole = new("ADMIN");
-                adminRole.Permissions.Add(permissionEntity);
+                adminRole.Permissions.Add(adminPermission);
                 await appContext.Roles.AddAsync(adminRole);
+
+                RoleEntity simpleRole = new("BASIC");
+                simpleRole.Permissions.Add(basicPermission);
+                await appContext.Roles.AddAsync(simpleRole);
                 await appContext.SaveChangesAsync(); // Guardar para generar el ID del rol
 
                 // Crear empleado inicial y asociar rol
@@ -122,7 +128,7 @@ namespace devgalop.facturabodega.webapi.Infrastructure.Persistence
                     hiringDate: DateTime.UtcNow.AddYears(-1),
                     contractType: EmployeeContractType.FULL_TIME,
                     passwordHashed: "hashed_password_example",
-                    roleId: adminRole.Id
+                    role: adminRole
                 );
                 await appContext.Employees.AddAsync(initialEmployee);
 

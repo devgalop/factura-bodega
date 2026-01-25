@@ -34,7 +34,7 @@ if (app.Environment.IsDevelopment())
         options.DarkMode = true;
     });
     app.MapGet("/", () => Results.Redirect("/docs"));
-    await app.ApplyMigrationsAsync();
+    await app.ResetDatabaseAsync();
     await app.SeedDatabaseAsync();
 }
 

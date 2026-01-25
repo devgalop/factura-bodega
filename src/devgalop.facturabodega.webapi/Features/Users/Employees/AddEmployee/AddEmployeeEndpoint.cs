@@ -14,11 +14,13 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
     /// </summary>
     /// <param name="Name">Nombre del empleado</param>
     /// <param name="Email">Correo del empleado</param>
+    /// <param name="Password">Contraseña del empleado</param>
     /// <param name="HiringDate">Fecha de contratación. No puede ser futura</param>
     /// <param name="ContractType">Tipo de contrato. (FULL_TIME, PART_TIME, CONTRACTOR)</param>
     public record AddEmployeeRequest(
         string Name,
         string Email,
+        string Password,
         DateTime HiringDate,
         string ContractType
     );
@@ -47,6 +49,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
                 await mediator.SendAsync(new AddEmployeeCommand(
                     request.Name,
                     request.Email,
+                    request.Password,
                     request.HiringDate,
                     Enum.Parse<EmployeeContractType>(request.ContractType)
                 ));
@@ -55,16 +58,16 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
             })
             .WithName("AddEmployee")
             .WithSummary("Agregar Empleado")
-            .WithDescription("""
+            .WithDescription(""" 
                 Agrega un nuevo empleado al sistema con la información proporcionada.
                 - `Name`: Nombre completo del empleado.
-                - `Email`: Correo electrónico del empleado. 
+                - `Email`: Correo electrónico del empleado.
+                - `Password`: Contraseña para la cuenta del empleado. 
                 - `HiringDate`: Fecha de contratación del empleado (no puede ser futura).
                 - `ContractType`: Tipo de contrato del empleado (por ejemplo, 'FULL_TIME', 'PART_TIME', 'CONTRACTOR').
             """)
             .Produces(StatusCodes.Status201Created)
-            .ProducesValidationProblem()
-            .WithTags("Employees");
+            .ProducesValidationProblem();
         }
     }
 

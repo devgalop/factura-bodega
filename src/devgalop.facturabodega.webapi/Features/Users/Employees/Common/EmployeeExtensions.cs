@@ -15,6 +15,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
         public static WebApplicationBuilder RegisterEmployeeFeatures(this WebApplicationBuilder builder)
         {
             builder.RegisterAddEmployeeFeature();
+            builder.RegisterAddEmployeePasswordManager();
             return builder;
         }
     }
