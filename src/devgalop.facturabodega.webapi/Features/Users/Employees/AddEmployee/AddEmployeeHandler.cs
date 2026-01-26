@@ -10,10 +10,10 @@ using FluentValidation;
 
 namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee;
 
-public class AddEmployeeHandler(AppDatabaseContext dbContext, IPasswordManager<AddEmployeeCommand> passwordManager) : ICommandHandler<AddEmployeeCommand>
+public class AddEmployeeHandler(AppDatabaseContext dbContext, IPasswordManager<EmployeeCredentials> passwordManager) : ICommandHandler<AddEmployeeCommand>
 {
     private readonly AppDatabaseContext _dbContext = dbContext;
-    private readonly IPasswordManager<AddEmployeeCommand> _passwordManager = passwordManager;
+    private readonly IPasswordManager<EmployeeCredentials> _passwordManager = passwordManager;
 
     public async Task HandleAsync(AddEmployeeCommand command)
     {
@@ -31,8 +31,9 @@ public class AddEmployeeHandler(AppDatabaseContext dbContext, IPasswordManager<A
         var role = _dbContext.Roles
             .Where(r => r.Name == "BASIC")
             .FirstOrDefault() ?? throw new Exception("El rol no se encontró en la base de datos.");
-        
-        string hashedPassword = _passwordManager.HashPassword(command, command.passwordHashed);
+            
+        EmployeeCredentials credentials = new(command.Email, command.Password);
+        string hashedPassword = _passwordManager.HashPassword(credentials, command.Password);
         
         var newEmployee = new EmployeeEntity(
             command.Name,
@@ -47,7 +48,7 @@ public class AddEmployeeHandler(AppDatabaseContext dbContext, IPasswordManager<A
     }
 }
 
-public record AddEmployeeCommand(string Name, string Email, string passwordHashed, DateTime HiringDate, EmployeeContractType ContractType) : ICommand;
+public record AddEmployeeCommand(string Name, string Email, string Password, DateTime HiringDate, EmployeeContractType ContractType) : ICommand;
 
 public static class AddEmployeeExtensions
 {
