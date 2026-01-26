@@ -89,6 +89,15 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
 
             RuleFor(x => x.ContractType)
                 .NotEmpty().WithMessage("El tipo de contrato es obligatorio.");
+            
+            RuleFor(x => x.Password)
+                .NotEmpty().WithMessage("La contraseña es obligatoria.")
+                .MinimumLength(8).WithMessage("La contraseña debe tener almenos 8 carácteres.")
+                .MaximumLength(16).WithMessage("La longitud de la contraseña no puede exceder 16 carácteres.")
+                .Matches(@"[A-Z]+").WithMessage("La contraseña debe contener al menos una letra mayúscula.")
+                .Matches(@"[a-z]+").WithMessage("La contraseña debe contener al menos una letra minúscula.")
+                .Matches(@"[0-9]+").WithMessage("La contraseña debe contener al menos un número.")
+                .Matches(@"[\!\?\*\.\-]+").WithMessage("La contraseña debe contener al menos un simbolo (!? *.-).");
         }
 
         private bool BeInPast(DateTime date)
