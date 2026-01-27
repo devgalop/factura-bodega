@@ -34,7 +34,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
                     request.Password
                 ));
                 
-                return Results.Ok("Empleado autenticado exitosamente.");
+                return Results.Ok(result);
             })
             .WithName("LoginEmployee")
             .WithSummary("Inicio de sesión de empleado")
