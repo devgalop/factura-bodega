@@ -61,14 +61,23 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
             ];
 
             var tokenResult = _tokenFactoryService.CreateToken(claims);
+
+            var refreshTokenResult = _tokenFactoryService.GenerateRefreshToken();
             
-            return new LoginResult(true, tokenResult.Token, tokenResult.Expiration);
+            var refreshToken = new EmployeeRefreshTokenEntity(
+                refreshTokenResult.Token,
+                refreshTokenResult.Expiration,
+                employeeFound);
+            _dbContext.RefreshTokens.Add(refreshToken);
+            await _dbContext.SaveChangesAsync();
+            
+            return new LoginResult(tokenResult.Token, refreshTokenResult.Token);
             
         }
     }
 
     public record LoginQuery(string Email, string Password) : IQuery;
-    public record LoginResult(bool IsSuccessful, string Token, DateTime Expiration);
+    public record LoginResult(string AccessToken, string RefreshToken);
     
     public static class LoginExtensions
     {

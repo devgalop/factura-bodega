@@ -30,10 +30,9 @@ namespace devgalop.facturabodega.webapi.Features.Users.Common
     /// <summary>
     /// Servicio para la creación de tokens JWT.
     /// </summary>
-    /// <param name="JwtOptions">Opciones de configuracion JWT</param>
-    public class TokenFactoryService(JwtOptions jwtOptions)
+    /// <param name="jwtOptions">Opciones de configuracion JWT</param>
+    public sealed class TokenFactoryService(JwtOptions jwtOptions)
     {
-        private readonly JwtOptions _jwtOptions = jwtOptions;
         
         /// <summary>
         /// Crea un token JWT con los claims proporcionados.
@@ -42,20 +41,34 @@ namespace devgalop.facturabodega.webapi.Features.Users.Common
         /// <returns>Token generado</returns>
         public TokenResult CreateToken(List<Claim> claims)
         {
-            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey));
+            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey));
             var tokenCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
-            DateTime expiration = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpirationInMinutes);
+            DateTime expiration = DateTime.UtcNow.AddMinutes(jwtOptions.ExpirationInMinutes);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = expiration,
-                Issuer = _jwtOptions.Issuer,
-                Audience = _jwtOptions.Audience,
+                Issuer = jwtOptions.Issuer,
+                Audience = jwtOptions.Audience,
                 SigningCredentials = tokenCredentials
             };
             var tokenHandler = new JsonWebTokenHandler();
 
             return new TokenResult(true, tokenHandler.CreateToken(tokenDescriptor), expiration);
+        }
+
+        /// <summary>
+        /// Genera un refresh token seguro.
+        /// </summary>
+        /// <returns>Token generado</returns>
+        public TokenResult GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            string refreshToken = Convert.ToBase64String(randomNumber);
+            DateTime expiration = DateTime.UtcNow.AddDays(7);
+            return new TokenResult(true, refreshToken, expiration);
         }
     }
 
