@@ -19,17 +19,12 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
     public class LoginHandler(
         AppDatabaseContext dbContext, 
         IPasswordManager<EmployeeCredentials> passwordManager,
-        IConfiguration configuration
+        TokenFactoryService tokenFactoryService
         ) : IQueryHandler<LoginQuery, LoginResult>
     {
         private readonly AppDatabaseContext _dbContext = dbContext;
         private readonly IPasswordManager<EmployeeCredentials> _passwordManager = passwordManager;
-        private readonly JwtOptions _jwtOptions = new JwtOptions(
-            configuration.GetValue<string>("Jwt:Issuer") ?? throw new ArgumentNullException("Jwt:Issuer no está configurado apropiadamente en los appsettings."),
-            configuration.GetValue<string>("Jwt:Audience") ?? throw new ArgumentNullException("Jwt:Audience no está configurado apropiadamente en los appsettings."),
-            configuration.GetValue<int>("Jwt:ExpirationInMinutes"),
-            configuration.GetValue<string>("Jwt:SecretKey") ?? throw new ArgumentNullException("Jwt:SecretKey no está configurado apropiadamente en los appsettings.")
-        );
+        private readonly TokenFactoryService _tokenFactoryService = tokenFactoryService;
 
         public async Task<LoginResult> HandleAsync(LoginQuery query)
         {
@@ -58,26 +53,16 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
                                                 "La contraseña proporcionada es incorrecta.")
                                         ]);
 
-           
-            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey));
-            var tokenCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
             List<Claim> claims =
             [
                 new Claim(ClaimTypes.NameIdentifier, employeeFound.Id.ToString()),
                 new Claim(ClaimTypes.Email, employeeFound.Email),
                 new Claim(ClaimTypes.Role, employeeFound.Role.Name)
             ];
-            DateTime expiration = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpirationInMinutes);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = expiration,
-                Issuer = _jwtOptions.Issuer,
-                Audience = _jwtOptions.Audience,
-                SigningCredentials = tokenCredentials
-            };
-            var tokenHandler = new JsonWebTokenHandler();
-            return new LoginResult(true, tokenHandler.CreateToken(tokenDescriptor), expiration);
+
+            var tokenResult = _tokenFactoryService.CreateToken(claims);
+            
+            return new LoginResult(true, tokenResult.Token, tokenResult.Expiration);
             
         }
     }
