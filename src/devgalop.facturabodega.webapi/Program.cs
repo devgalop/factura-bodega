@@ -1,5 +1,6 @@
 
 using devgalop.facturabodega.webapi.Common;
+using devgalop.facturabodega.webapi.Features.Users.Common;
 using devgalop.facturabodega.webapi.Features.Users.Employees.Common;
 using devgalop.facturabodega.webapi.Infrastructure.Persistence;
 using FluentValidation;
@@ -15,6 +16,7 @@ builder.AddDatabaseContext()
         .AddMediator()
         .AddEndpoints()
         .RegisterEmployeeFeatures()
+        .RegisterTokenFactoryService()
         .AddExceptionHandlers();
 
 var app = builder.Build();
@@ -41,6 +43,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
+app.UseTokenFactory();
 
 app.Run();
 

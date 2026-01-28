@@ -69,8 +69,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
 
     public record LoginQuery(string Email, string Password) : IQuery;
     public record LoginResult(bool IsSuccessful, string Token, DateTime Expiration);
-
-    public record JwtOptions(string Issuer, string Audience, int ExpirationInMinutes, string SecretKey);
+    
     public static class LoginExtensions
     {
         /// <summary>
