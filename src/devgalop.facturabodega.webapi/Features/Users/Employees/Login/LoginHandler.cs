@@ -63,7 +63,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
             var tokenResult = _tokenFactoryService.CreateToken(claims);
 
             var refreshTokenResult = _tokenFactoryService.GenerateRefreshToken();
-            
+
             var refreshToken = new EmployeeRefreshTokenEntity(
                 refreshTokenResult.Token,
                 refreshTokenResult.Expiration,
@@ -76,9 +76,23 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
         }
     }
 
+    /// <summary>
+    /// Consulta para el inicio de sesión de empleado.
+    /// </summary>
+    /// <param name="Email">Correo del empleado</param>
+    /// <param name="Password">Contraseña del empleado</param>
     public record LoginQuery(string Email, string Password) : IQuery;
+
+    /// <summary>
+    /// Resultado del inicio de sesión de empleado.
+    /// </summary>
+    /// <param name="AccessToken">Token de acceso</param>
+    /// <param name="RefreshToken">Token para refrescar</param>
     public record LoginResult(string AccessToken, string RefreshToken);
-    
+
+    /// <summary>
+    /// Extensiones para el feature de inicio de sesión de empleado.
+    /// </summary>    
     public static class LoginExtensions
     {
         /// <summary>

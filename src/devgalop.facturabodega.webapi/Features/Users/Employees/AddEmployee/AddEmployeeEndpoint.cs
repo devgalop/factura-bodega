@@ -25,8 +25,15 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
         string ContractType
     );
     
-    public class AddEmployeeEndpoint : IEndpoint
+    public sealed class AddEmployeeEndpoint : IEndpoint
     {
+        /// <summary>
+        /// Respuesta al agregar un nuevo empleado.
+        /// </summary>
+        /// <param name="IsSuccessful">Resultado de la operación</param>
+        /// <param name="Message">Mensaje descriptivo</param>
+        public record AddEmployeeResponse(bool IsSuccessful, string Message);
+
         public async Task MapEndpoint(IEndpointRouteBuilder app)
         {
             app.MapPost("/employees/add", async (
@@ -54,7 +61,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
                     Enum.Parse<EmployeeContractType>(request.ContractType)
                 ));
                 
-                return Results.StatusCode(StatusCodes.Status201Created);
+                return Results.Json(new AddEmployeeResponse(true, "Empleado registrado en la base de datos de manera exitosa."), statusCode: 201);
             })
             .WithName("AddEmployee")
             .WithSummary("Agregar Empleado")
@@ -66,7 +73,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
                 - `HiringDate`: Fecha de contratación del empleado (no puede ser futura).
                 - `ContractType`: Tipo de contrato del empleado (por ejemplo, 'FULL_TIME', 'PART_TIME', 'CONTRACTOR').
             """)
-            .Produces(StatusCodes.Status201Created)
+            .Produces<AddEmployeeResponse>(StatusCodes.Status201Created)
             .ProducesValidationProblem();
         }
     }
