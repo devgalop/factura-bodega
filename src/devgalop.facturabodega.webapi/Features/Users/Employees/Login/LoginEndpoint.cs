@@ -20,7 +20,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
 
     public sealed class LoginEndpoint : IEndpoint
     {
-        public async Task MapEndpoint(IEndpointRouteBuilder app)
+        public void MapEndpoint(IEndpointRouteBuilder app)
         {
             app.MapPost("/employees/login", async (
                     LoginRequest request, 

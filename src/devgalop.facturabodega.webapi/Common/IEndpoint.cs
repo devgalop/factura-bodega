@@ -14,7 +14,7 @@ namespace devgalop.facturabodega.webapi.Common
         /// </summary>
         /// <param name="app">builder de aplicación</param>
         /// <returns></returns>
-        Task MapEndpoint(IEndpointRouteBuilder app);
+        void MapEndpoint(IEndpointRouteBuilder app);
     }
 
     public static class EndpointExtensions

@@ -34,7 +34,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
         /// <param name="Message">Mensaje descriptivo</param>
         public record AddEmployeeResponse(bool IsSuccessful, string Message);
 
-        public async Task MapEndpoint(IEndpointRouteBuilder app)
+        public void MapEndpoint(IEndpointRouteBuilder app)
         {
             app.MapPost("/employees/add", async (
                     AddEmployeeRequest request, 
