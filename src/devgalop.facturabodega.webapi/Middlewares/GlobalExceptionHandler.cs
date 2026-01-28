@@ -19,7 +19,8 @@ namespace devgalop.facturabodega.webapi.Middlewares
                 ProblemDetails = new()
                 {
                     Title = "Error interno del servidor",
-                    Detail = "Ha ocurrido un error inesperado mientras se procesaba la solicitud. Por favor, intente nuevamente más tarde.",
+                    Detail = $"Ha ocurrido un error inesperado mientras se procesaba la solicitud. Por favor, intente nuevamente más tarde. {exception.Message}",
+                    Status = StatusCodes.Status500InternalServerError
                 }
             });
         }
