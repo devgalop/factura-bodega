@@ -41,12 +41,15 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
         public Guid RoleId { get; set; }
         public RoleEntity Role { get; set; }
 
+        public ICollection<EmployeeRefreshTokenEntity> RefreshTokens { get; set; }
+
         private EmployeeEntity()
         {
             Name = string.Empty;
             Email = string.Empty;
             PasswordHashed = string.Empty;
             Role = null!;
+            RefreshTokens = new List<EmployeeRefreshTokenEntity>();
         }
 
         public EmployeeEntity(string name, 
@@ -65,6 +68,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
             Status = EmployeeStatus.ACTIVE;
             RoleId = role.Id;
             Role = role;
+            RefreshTokens = new List<EmployeeRefreshTokenEntity>();
         }
 
         /// <summary>

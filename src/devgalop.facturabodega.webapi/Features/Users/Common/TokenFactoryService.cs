@@ -95,6 +95,8 @@ namespace devgalop.facturabodega.webapi.Features.Users.Common
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
                 };
             });
+
+            builder.Services.AddAuthorization();
             
             return builder;
         }

@@ -12,6 +12,7 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
     public DbSet<EmployeeEntity> Employees { get; set; }
     public DbSet<RoleEntity> Roles { get; set; }
     public DbSet<PermissionEntity> Permissions { get; set; }
+    public DbSet<EmployeeRefreshTokenEntity> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,6 +26,7 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
             entity.Property(e => e.HiringDate).IsRequired();
             entity.Property(e => e.ContractType).HasConversion<int>().IsRequired();
             entity.Property(e => e.Status).HasConversion<int>().IsRequired();
+            entity.HasIndex(e => e.Email).IsUnique();
         });
 
         modelBuilder.Entity<RoleEntity>(entity =>
@@ -32,12 +34,22 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
             entity.HasKey(r => r.Id);
             entity.Property(r => r.Name).IsRequired().HasMaxLength(100);
             entity.Property(r => r.Status).HasConversion<int>().IsRequired();
+            entity.HasIndex(r => r.Name).IsUnique();
         });
 
         modelBuilder.Entity<PermissionEntity>(entity =>
         {
             entity.HasKey(p => p.Id);
             entity.Property(p => p.Name).IsRequired().HasMaxLength(100);
+            entity.HasIndex(p => p.Name).IsUnique();
+        });
+
+        modelBuilder.Entity<EmployeeRefreshTokenEntity>(entity =>
+        {
+            entity.HasKey(rt => rt.Id);
+            entity.Property(rt => rt.Token).IsRequired().HasMaxLength(200);
+            entity.Property(rt => rt.ExpiresOnUtc).IsRequired();
+            entity.HasIndex(rt => rt.Token).IsUnique();
         });
 
         // Relación 1-N entre Employee y Role
@@ -61,6 +73,13 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
                       .WithMany()
                       .HasForeignKey("RoleId")
                       .OnDelete(DeleteBehavior.Cascade)); // Eliminación en cascada
+
+        // Relación 1-N entre Employee y EmployeeRefreshTokenEntity
+        modelBuilder.Entity<EmployeeRefreshTokenEntity>()
+            .HasOne(rt => rt.Employee) // Un token de refresco pertenece a un empleado
+            .WithMany(e => e.RefreshTokens) // Un empleado puede tener muchos tokens de refresco
+            .HasForeignKey(rt => rt.EmployeeId) // La clave foránea en EmployeeRefreshTokenEntity
+            .OnDelete(DeleteBehavior.Cascade); // Eliminación en cascada
 
     }
 

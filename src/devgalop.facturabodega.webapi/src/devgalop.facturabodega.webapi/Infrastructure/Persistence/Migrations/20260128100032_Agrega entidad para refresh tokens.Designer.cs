@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using devgalop.facturabodega.webapi.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace devgalop.facturabodega.webapi.Infrastructure.Persistence.Migrations
+namespace devgalop.facturabodega.webapi.src.devgalop.facturabodega.webapi.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDatabaseContext))]
-    partial class AppDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260128100032_Agrega entidad para refresh tokens")]
+    partial class Agregaentidadpararefreshtokens
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
