@@ -6,6 +6,7 @@ using devgalop.facturabodega.webapi.Common;
 using devgalop.facturabodega.webapi.Features.Users.Employees.Common;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 
 namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
 {
@@ -63,6 +64,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
                 
                 return Results.Json(new AddEmployeeResponse(true, "Empleado registrado en la base de datos de manera exitosa."), statusCode: 201);
             })
+            .RequireAuthorization("AdminOnly")
             .WithName("AddEmployee")
             .WithSummary("Agregar Empleado")
             .WithDescription(""" 
