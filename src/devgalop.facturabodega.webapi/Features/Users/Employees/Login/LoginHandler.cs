@@ -16,19 +16,36 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
 {
-    public class LoginHandler(
+    /// <summary>
+    /// Consulta para el inicio de sesión de empleado.
+    /// </summary>
+    /// <param name="Email">Correo del empleado</param>
+    /// <param name="Password">Contraseña del empleado</param>
+    public record LoginQuery(string Email, string Password) : IQuery;
+
+    /// <summary>
+    /// Resultado del inicio de sesión de empleado.
+    /// </summary>
+    /// <param name="AccessToken">Token de acceso</param>
+    /// <param name="RefreshToken">Token para refrescar</param>
+    public record LoginResult(string AccessToken, string RefreshToken);
+
+    /// <summary>
+    /// Handler para el inicio de sesión de empleado.
+    /// </summary>
+    /// <param name="dbContext">Contexto de base de datos</param>
+    /// <param name="passwordManager">Gestor de creedenciales</param>
+    /// <param name="tokenFactoryService">Proveedor de tokens</param>
+    public sealed class LoginHandler(
         AppDatabaseContext dbContext, 
         IPasswordManager<EmployeeCredentials> passwordManager,
         TokenFactoryService tokenFactoryService
         ) : IQueryHandler<LoginQuery, LoginResult>
     {
-        private readonly AppDatabaseContext _dbContext = dbContext;
-        private readonly IPasswordManager<EmployeeCredentials> _passwordManager = passwordManager;
-        private readonly TokenFactoryService _tokenFactoryService = tokenFactoryService;
 
         public async Task<LoginResult> HandleAsync(LoginQuery query)
         {
-            var employeeFound = _dbContext.Employees
+            var employeeFound = dbContext.Employees
                                     .Include(e => e.Role)
                                     .Where(e => e.Email == query.Email)
                                     .FirstOrDefault() 
@@ -41,7 +58,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
 
             EmployeeCredentials credentials = new(query.Email, query.Password);
             
-            bool isPasswordValid = _passwordManager.VerifyHashedPassword(
+            bool isPasswordValid = passwordManager.VerifyHashedPassword(
                 credentials,  
                 employeeFound.PasswordHashed,
                 query.Password);
@@ -60,35 +77,85 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
                 new Claim(ClaimTypes.Role, employeeFound.Role.Name)
             ];
 
-            var tokenResult = _tokenFactoryService.CreateToken(claims);
+            var tokenResult = tokenFactoryService.CreateToken(claims);
 
-            var refreshTokenResult = _tokenFactoryService.GenerateRefreshToken();
+            var refreshTokenResult = tokenFactoryService.GenerateRefreshToken();
 
             var refreshToken = new EmployeeRefreshTokenEntity(
                 refreshTokenResult.Token,
                 refreshTokenResult.Expiration,
                 employeeFound);
-            _dbContext.RefreshTokens.Add(refreshToken);
-            await _dbContext.SaveChangesAsync();
+            dbContext.RefreshTokens.Add(refreshToken);
+            await dbContext.SaveChangesAsync();
             
             return new LoginResult(tokenResult.Token, refreshTokenResult.Token);
             
         }
     }
 
-    /// <summary>
-    /// Consulta para el inicio de sesión de empleado.
-    /// </summary>
-    /// <param name="Email">Correo del empleado</param>
-    /// <param name="Password">Contraseña del empleado</param>
-    public record LoginQuery(string Email, string Password) : IQuery;
 
     /// <summary>
-    /// Resultado del inicio de sesión de empleado.
+    /// Solicitud de inicio de sesión con refresh token.
     /// </summary>
-    /// <param name="AccessToken">Token de acceso</param>
     /// <param name="RefreshToken">Token para refrescar</param>
-    public record LoginResult(string AccessToken, string RefreshToken);
+    public record LoginWithRefreshTokenRequest(
+        string RefreshToken
+    ):IQuery;
+
+    /// <summary>
+    /// Handler para el inicio de sesión con refresh token.
+    /// </summary>
+    /// <param name="dbContext"></param>
+    /// <param name="tokenFactoryService"></param>
+    public sealed class LoginWithRefreshTokenHandler(
+        AppDatabaseContext dbContext,
+        TokenFactoryService tokenFactoryService
+        ) : IQueryHandler<LoginWithRefreshTokenRequest, LoginResult>
+    {
+
+        public async Task<LoginResult> HandleAsync(LoginWithRefreshTokenRequest query)
+        {
+            var refreshTokenEntity = await dbContext.RefreshTokens
+                                            .Include(rt => rt.Employee)
+                                            .ThenInclude(e => e.Role)
+                                            .Where(rt => rt.Token == query.RefreshToken)
+                                            .FirstOrDefaultAsync()
+                                            ?? throw new ValidationException(
+                                                [
+                                                    new FluentValidation.Results.ValidationFailure(
+                                                        nameof(query.RefreshToken),
+                                                        "El token para refrescar proporcionado no es válido.")
+                                                ]);
+
+            if(refreshTokenEntity.ExpiresOnUtc < DateTime.UtcNow)
+            {
+                throw new ValidationException(
+                    [
+                        new FluentValidation.Results.ValidationFailure(
+                            nameof(query.RefreshToken),
+                            "El token para refrescar ha expirado.")
+                    ]);
+            }
+
+            List<Claim> claims =
+            [
+                new Claim(ClaimTypes.NameIdentifier, refreshTokenEntity.Employee.Id.ToString()),
+                new Claim(ClaimTypes.Email, refreshTokenEntity.Employee.Email),
+                new Claim(ClaimTypes.Role, refreshTokenEntity.Employee.Role.Name)
+            ];
+
+            var tokenResult = tokenFactoryService.CreateToken(claims);
+            var refreshTokenResult = tokenFactoryService.GenerateRefreshToken();
+            refreshTokenEntity.Token = refreshTokenResult.Token;
+            refreshTokenEntity.ExpiresOnUtc = refreshTokenResult.Expiration;
+
+            await dbContext.SaveChangesAsync();
+
+            return new LoginResult(tokenResult.Token, refreshTokenResult.Token);
+        }
+    }
+
+    
 
     /// <summary>
     /// Extensiones para el feature de inicio de sesión de empleado.
@@ -104,7 +171,8 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
         {
             var optionsJWT = builder.Configuration.GetSection("Jwt").Get<JwtOptions>() ?? throw new ArgumentNullException("Jwt no está configurado apropiadamente en los appsettings.");
             builder.Services.AddSingleton(optionsJWT);
-            builder.Services.AddScoped<IQueryHandler<LoginQuery, LoginResult>, LoginHandler>();
+            builder.Services.AddScoped<IQueryHandler<LoginQuery, LoginResult>, LoginHandler>()
+                            .AddScoped<IQueryHandler<LoginWithRefreshTokenRequest, LoginResult>, LoginWithRefreshTokenHandler>();
             return builder;
         }
     }

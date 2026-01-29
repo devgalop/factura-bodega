@@ -43,7 +43,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
                 - `Email`: Correo electrónico del empleado.
                 - `Password`: Contraseña para la cuenta del empleado.
             """)
-            .Produces(StatusCodes.Status200OK)
+            .Produces<LoginResult>(StatusCodes.Status200OK)
             .ProducesValidationProblem();
         }
     }
@@ -64,6 +64,45 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
                 .Matches(@"[a-z]+").WithMessage("La contraseña debe contener al menos una letra minúscula.")
                 .Matches(@"[0-9]+").WithMessage("La contraseña debe contener al menos un número.")
                 .Matches(@"[\!\?\*\.\-]+").WithMessage("La contraseña debe contener al menos un simbolo (!? *.-).");
+        }
+    }
+
+    /// <summary>
+    /// Endpoint para el inicio de sesión con refresh token.
+    /// </summary>
+    public sealed class LoginWithRefreshTokenEndpoint : IEndpoint
+    {
+        public void MapEndpoint(IEndpointRouteBuilder app)
+        {
+            app.MapPost("/employees/login/refresh-token", async (
+                    LoginWithRefreshTokenRequest request, 
+                    IMediator mediator,
+                    IValidator<LoginWithRefreshTokenRequest> validator) =>
+            {
+                validator.ValidateAndThrow(request);
+
+                LoginResult result = await mediator.SendAsync<LoginWithRefreshTokenRequest, LoginResult>(request);
+                
+                return Results.Ok(result);
+            })
+            .WithName("LoginEmployeeWithRefreshToken")
+            .WithSummary("Inicio de sesión de empleado con refresh token")
+            .WithDescription(""" 
+                Inicia sesión en la cuenta de un empleado existente utilizando un refresh token válido.
+                - `RefreshToken`: Token para refrescar la sesión del empleado.
+            """)
+            .Produces<LoginResult>(StatusCodes.Status200OK)
+            .ProducesValidationProblem();
+        }
+    }
+
+    internal sealed class LoginRefreshTokenValidator : AbstractValidator<LoginWithRefreshTokenRequest>
+    {
+        public LoginRefreshTokenValidator()
+        {
+            RuleFor(x => x.RefreshToken)
+                .NotEmpty().WithMessage("El refresh token es obligatorio.")
+                .MaximumLength(200).WithMessage("La longitud del refresh token no puede exceder los 200 carácteres.");
         }
     }
 }
