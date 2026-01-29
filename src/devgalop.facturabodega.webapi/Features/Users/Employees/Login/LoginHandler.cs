@@ -118,6 +118,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
             var refreshTokenEntity = await dbContext.RefreshTokens
                                             .Include(rt => rt.Employee)
                                             .ThenInclude(e => e.Role)
+                                            .ThenInclude(r => r.Permissions)
                                             .Where(rt => rt.Token == query.RefreshToken)
                                             .FirstOrDefaultAsync()
                                             ?? throw new ValidationException(

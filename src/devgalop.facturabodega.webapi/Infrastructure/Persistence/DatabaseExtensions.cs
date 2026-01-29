@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using devgalop.facturabodega.webapi.Features.Users.Common;
 using devgalop.facturabodega.webapi.Features.Users.Employees.Common;
 using Microsoft.EntityFrameworkCore;
 
@@ -95,6 +97,9 @@ namespace devgalop.facturabodega.webapi.Infrastructure.Persistence
             using IServiceScope scope = app.Services.CreateScope();
             await using AppDatabaseContext appContext =
                 scope.ServiceProvider.GetRequiredService<AppDatabaseContext>();
+            
+            IPasswordManager<EmployeeCredentials> credentialsManager = 
+                scope.ServiceProvider.GetRequiredService<IPasswordManager<EmployeeCredentials>>();
             using var transaction = await appContext.Database.BeginTransactionAsync();
             try
             {
@@ -106,28 +111,53 @@ namespace devgalop.facturabodega.webapi.Infrastructure.Persistence
                 }
 
                 // Crear permiso inicial
-                PermissionEntity adminPermission = new("ALL");
-                await appContext.Permissions.AddAsync(adminPermission);
-                PermissionEntity basicPermission = new("BASIC");
-                await appContext.Permissions.AddAsync(basicPermission);
+                PermissionEntity canCreateEmployeePermision = new("CanCreateEmployee");
+                await appContext.Permissions.AddAsync(canCreateEmployeePermision);
+                PermissionEntity canModifyEmployeePermision = new("CanModifyEmployee");
+                await appContext.Permissions.AddAsync(canModifyEmployeePermision);
+                PermissionEntity canRemoveEmployeePermision = new("CanRemoveEmployee");
+                await appContext.Permissions.AddAsync(canRemoveEmployeePermision);
+                PermissionEntity canRevokeEmployeePermision = new("CanRevokeEmployeeTokens");
+                await appContext.Permissions.AddAsync(canRevokeEmployeePermision);
+                PermissionEntity canCreateCustomerPermission = new("CanCreateCustomer");
+                await appContext.Permissions.AddAsync(canCreateCustomerPermission);
+                PermissionEntity canModifyCustomerPermission = new("CanModifyCustomer");
+                await appContext.Permissions.AddAsync(canModifyCustomerPermission);
+                PermissionEntity CanRecoveryPassword = new("CanRecoveryPassword");
+                await appContext.Permissions.AddAsync(CanRecoveryPassword);
+                PermissionEntity canRefeshTokenPermission = new("CanRefreshToken");
+                await appContext.Permissions.AddAsync(canRefeshTokenPermission);
+                
 
                 // Crear rol inicial y asociar permiso
                 RoleEntity adminRole = new("ADMIN");
-                adminRole.Permissions.Add(adminPermission);
+                adminRole.Permissions.Add(canCreateEmployeePermision);
+                adminRole.Permissions.Add(canModifyEmployeePermision);
+                adminRole.Permissions.Add(canRemoveEmployeePermision);
+                adminRole.Permissions.Add(canRevokeEmployeePermision);
+                adminRole.Permissions.Add(canCreateCustomerPermission);
+                adminRole.Permissions.Add(canModifyCustomerPermission);
+                adminRole.Permissions.Add(CanRecoveryPassword);
+                adminRole.Permissions.Add(canRefeshTokenPermission);
                 await appContext.Roles.AddAsync(adminRole);
 
                 RoleEntity simpleRole = new("BASIC");
-                simpleRole.Permissions.Add(basicPermission);
+                simpleRole.Permissions.Add(CanRecoveryPassword);
+                simpleRole.Permissions.Add(canRefeshTokenPermission);
                 await appContext.Roles.AddAsync(simpleRole);
                 await appContext.SaveChangesAsync(); // Guardar para generar el ID del rol
 
+                string samplePassword = "Password1234_*";
+                string sampleEmail = "facu@yopmail.com";
+                EmployeeCredentials credentials = new(sampleEmail, samplePassword);
+                string hashedPassword = credentialsManager.HashPassword(credentials, samplePassword);
                 // Crear empleado inicial y asociar rol
                 EmployeeEntity initialEmployee = new(
-                    name: "Juan Pérez",
-                    email: "jperez@yopmail.com",
+                    name: "Facundo",
+                    email: sampleEmail,
                     hiringDate: DateTime.UtcNow.AddYears(-1),
                     contractType: EmployeeContractType.FULL_TIME,
-                    passwordHashed: "hashed_password_example",
+                    passwordHashed: hashedPassword,
                     role: adminRole
                 );
                 await appContext.Employees.AddAsync(initialEmployee);
