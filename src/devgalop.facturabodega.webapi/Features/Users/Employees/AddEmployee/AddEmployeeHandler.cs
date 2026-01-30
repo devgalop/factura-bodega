@@ -10,14 +10,13 @@ using FluentValidation;
 
 namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee;
 
-public class AddEmployeeHandler(AppDatabaseContext dbContext, IPasswordManager<EmployeeCredentials> passwordManager) : ICommandHandler<AddEmployeeCommand>
+public sealed class AddEmployeeHandler(
+    AppDatabaseContext dbContext, 
+    IPasswordManager<EmployeeCredentials> passwordManager) : ICommandHandler<AddEmployeeCommand>
 {
-    private readonly AppDatabaseContext _dbContext = dbContext;
-    private readonly IPasswordManager<EmployeeCredentials> _passwordManager = passwordManager;
-
     public async Task HandleAsync(AddEmployeeCommand command)
     {
-        bool isAlreadyRegistered = _dbContext.Employees.Where(e => e.Email == command.Email).Any();
+        bool isAlreadyRegistered = dbContext.Employees.Where(e => e.Email == command.Email).Any();
         if(isAlreadyRegistered)
         {
             throw new ValidationException(
@@ -28,12 +27,12 @@ public class AddEmployeeHandler(AppDatabaseContext dbContext, IPasswordManager<E
                 ]);
         }
         
-        var role = _dbContext.Roles
+        var role = dbContext.Roles
             .Where(r => r.Name == "BASIC")
             .FirstOrDefault() ?? throw new Exception("El rol no se encontró en la base de datos.");
             
         EmployeeCredentials credentials = new(command.Email, command.Password);
-        string hashedPassword = _passwordManager.HashPassword(credentials, command.Password);
+        string hashedPassword = passwordManager.HashPassword(credentials, command.Password);
         
         var newEmployee = new EmployeeEntity(
             command.Name,
@@ -43,8 +42,8 @@ public class AddEmployeeHandler(AppDatabaseContext dbContext, IPasswordManager<E
             command.ContractType,
             role);
 
-        await _dbContext.Employees.AddAsync(newEmployee);
-        await _dbContext.SaveChangesAsync();
+        await dbContext.Employees.AddAsync(newEmployee);
+        await dbContext.SaveChangesAsync();
     }
 }
 

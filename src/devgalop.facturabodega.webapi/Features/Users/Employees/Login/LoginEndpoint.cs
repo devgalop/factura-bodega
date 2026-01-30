@@ -36,6 +36,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
                 
                 return Results.Ok(result);
             })
+            .AllowAnonymous()
             .WithName("LoginEmployee")
             .WithSummary("Inicio de sesión de empleado")
             .WithDescription(""" 

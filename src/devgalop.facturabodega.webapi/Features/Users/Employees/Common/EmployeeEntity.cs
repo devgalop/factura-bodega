@@ -30,11 +30,11 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
     public class EmployeeEntity
     {
         public Guid Id { get; set; }
-        public string Name { get; private set; }
+        public string Name { get; set; }
         public string Email { get; private set; }
         public string PasswordHashed { get; set; }
-        public DateTime HiringDate { get; private set; }
-        public EmployeeContractType ContractType { get; private set; }
+        public DateTime HiringDate { get; set; }
+        public EmployeeContractType ContractType { get; set; }
         public EmployeeStatus Status { get; set; }
 
         
