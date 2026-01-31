@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee;
 using devgalop.facturabodega.webapi.Features.Users.Employees.EditEmployee;
+using devgalop.facturabodega.webapi.Features.Users.Employees.GetEmployee;
 using devgalop.facturabodega.webapi.Features.Users.Employees.Login;
 
 namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
@@ -18,6 +19,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
         {
             builder.RegisterAddEmployeeFeature();
             builder.RegisterEditEmployeeFeature();
+            builder.RegisterGetEmployeeFeatures();
             builder.RegisterEmployeeCredentialsManager();
             builder.RegisterLoginFeature();
             return builder;

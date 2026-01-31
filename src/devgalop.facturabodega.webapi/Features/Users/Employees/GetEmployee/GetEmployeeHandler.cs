@@ -35,10 +35,30 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.GetEmployee
     );
 
     /// <summary>
+    /// Respuesta con la información mínima del empleado.
+    /// </summary>
+    /// <param name="Id">Identificacion del empleado</param>
+    /// <param name="Name">Nombre del empleado</param>
+    /// <param name="IsActive">Esta activo en el sistema</param>
+    public record GetEmployeesMinimunInfoResponse(
+        Guid Id,
+        string Name,
+        bool IsActive
+    );
+
+    /// <summary>
+    /// Respuesta con la lista de empleados.
+    /// </summary>
+    /// <param name="Employees">Lista de empleados</param>
+    public record GetEmployeesResponse(
+        List<GetEmployeesMinimunInfoResponse> Employees
+    );
+
+    /// <summary>
     /// Manejador para procesar la solicitud de obtención de un empleado.
     /// </summary>
     /// <param name="dbContext"></param>
-    public class GetEmployeeHandler(AppDatabaseContext dbContext) 
+    public sealed class GetEmployeeHandler(AppDatabaseContext dbContext) 
                 : IQueryHandler<GetEmployeeRequest, GetEmployeeResponse>
     {
         public async Task<GetEmployeeResponse> HandleAsync(GetEmployeeRequest query)
@@ -59,4 +79,48 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.GetEmployee
             return employeeFound;
         }
     }
+
+    /// <summary>
+    /// Manejador para procesar la solicitud de obtención de la lista de empleados.
+    /// </summary>
+    /// <param name="dbContext"></param>
+    public sealed class GetEmployeesHandler(AppDatabaseContext dbContext)
+        : IQueryHandler<GetEmployeesRequest, GetEmployeesResponse>
+    {
+        public async Task<GetEmployeesResponse> HandleAsync(GetEmployeesRequest query)
+        {
+            var employeesQuery = dbContext.Employees.AsQueryable();
+
+            if (!query.IncludeInactive)
+            {
+                employeesQuery = employeesQuery.Where(e => e.Status == EmployeeStatus.ACTIVE);
+            }
+
+            var employeesList = employeesQuery
+                .Select(e => new GetEmployeesMinimunInfoResponse(
+                    e.Id,
+                    e.Name,
+                    e.Status == EmployeeStatus.ACTIVE
+                ))
+                .ToList();
+
+            return new GetEmployeesResponse(employeesList);
+        }
+    }
+
+
+    public static class GetEmployeeExtensions
+    {
+        /// <summary>
+        /// Registra los servicios de los features de obtención de empleados.
+        /// </summary>
+        /// <param name="builder">builder de aplicación</param>
+        public static WebApplicationBuilder RegisterGetEmployeeFeatures(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddScoped<IQueryHandler<GetEmployeeRequest, GetEmployeeResponse>, GetEmployeeHandler>()
+                            .AddScoped<IQueryHandler<GetEmployeesRequest, GetEmployeesResponse>, GetEmployeesHandler>();
+            return builder;
+        }
+    }
+
 }
