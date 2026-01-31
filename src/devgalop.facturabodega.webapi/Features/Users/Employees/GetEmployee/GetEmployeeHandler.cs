@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using devgalop.facturabodega.webapi.Common;
 using devgalop.facturabodega.webapi.Features.Users.Employees.Common;
 using devgalop.facturabodega.webapi.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace devgalop.facturabodega.webapi.Features.Users.Employees.GetEmployee
 {
@@ -63,7 +64,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.GetEmployee
     {
         public async Task<GetEmployeeResponse> HandleAsync(GetEmployeeRequest query)
         {
-            var employeeFound = dbContext.Employees
+            var employeeFound = await dbContext.Employees
                 .Where(e => e.Id.ToString() == query.Id)
                 .Select(e => new GetEmployeeResponse(
                     e.Id,
@@ -74,7 +75,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.GetEmployee
                     e.Role.Name,
                     e.Status == EmployeeStatus.ACTIVE
                 ))
-                .FirstOrDefault() ?? throw new EmployeeNotFoundException(query.Id);
+                .FirstOrDefaultAsync() ?? throw new EmployeeNotFoundException(query.Id);
             
             return employeeFound;
         }

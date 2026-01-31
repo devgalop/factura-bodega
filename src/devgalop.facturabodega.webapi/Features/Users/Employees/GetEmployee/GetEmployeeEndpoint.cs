@@ -70,8 +70,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.GetEmployee
             .WithDescription(""" 
                 Obtener la información existente de los empleado en el sistema.
             """)
-            .Produces<GetEmployeesResponse>(StatusCodes.Status200OK)
-            .ProducesValidationProblem();
+            .Produces<GetEmployeesResponse>(StatusCodes.Status200OK);
         }
     }
 

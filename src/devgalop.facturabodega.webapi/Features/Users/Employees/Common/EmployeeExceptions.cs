@@ -9,7 +9,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
     {
         public string Email {get;}
         public EmployeeNotFoundException(string email) 
-            : base($"El empleado con el email '{email}' no se encuentra registrado.")
+            : base($"El empleado '{email}' no se encuentra registrado.")
         {
             Email = email;
         }
