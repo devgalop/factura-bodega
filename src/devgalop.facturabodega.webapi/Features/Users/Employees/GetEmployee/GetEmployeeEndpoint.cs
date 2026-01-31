@@ -78,7 +78,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.GetEmployee
     /// <summary>
     /// Validador para la petición de obtención de un empleado.
     /// </summary>
-    internal sealed class GetEmployeeRequestValidator : AbstractValidator<GetEmployeeRequest>
+    public sealed class GetEmployeeRequestValidator : AbstractValidator<GetEmployeeRequest>
     {
         public GetEmployeeRequestValidator()
         {

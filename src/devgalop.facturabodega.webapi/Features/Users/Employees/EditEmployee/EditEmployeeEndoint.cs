@@ -83,7 +83,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.EditEmployee
         }
     }
 
-    internal sealed class EditEmployeeValidator : AbstractValidator<EditEmployeeRequest>
+    public sealed class EditEmployeeValidator : AbstractValidator<EditEmployeeRequest>
     {
         public EditEmployeeValidator()
         {

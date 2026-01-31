@@ -80,7 +80,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
         }
     }
 
-    internal sealed class AddEmployeeRequestValidator : AbstractValidator<AddEmployeeRequest>
+    public sealed class AddEmployeeRequestValidator : AbstractValidator<AddEmployeeRequest>
     {
         public AddEmployeeRequestValidator()
         {

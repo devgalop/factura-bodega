@@ -49,7 +49,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
         }
     }
 
-    internal sealed class LoginValidator : AbstractValidator<LoginRequest>
+    public sealed class LoginValidator : AbstractValidator<LoginRequest>
     {
         public LoginValidator()
         {
@@ -97,7 +97,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
         }
     }
 
-    internal sealed class LoginRefreshTokenValidator : AbstractValidator<LoginWithRefreshTokenRequest>
+    public sealed class LoginRefreshTokenValidator : AbstractValidator<LoginWithRefreshTokenRequest>
     {
         public LoginRefreshTokenValidator()
         {
