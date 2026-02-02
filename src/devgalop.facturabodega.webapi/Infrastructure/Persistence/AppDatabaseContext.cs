@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using devgalop.facturabodega.webapi.Features.Users.Customers.Common;
 using devgalop.facturabodega.webapi.Features.Users.Employees.Common;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,7 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
     public DbSet<RoleEntity> Roles { get; set; }
     public DbSet<PermissionEntity> Permissions { get; set; }
     public DbSet<EmployeeRefreshTokenEntity> RefreshTokens { get; set; }
+    public DbSet<CustomerEntity> Customers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -23,10 +25,13 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Email).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.PasswordHashed).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Document).IsRequired().HasMaxLength(50);
             entity.Property(e => e.HiringDate).IsRequired();
             entity.Property(e => e.ContractType).HasConversion<int>().IsRequired();
             entity.Property(e => e.Status).HasConversion<int>().IsRequired();
             entity.HasIndex(e => e.Email).IsUnique();
+            entity.HasIndex(e => e.Document).IsUnique();
         });
 
         modelBuilder.Entity<RoleEntity>(entity =>
@@ -50,6 +55,16 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
             entity.Property(rt => rt.Token).IsRequired().HasMaxLength(200);
             entity.Property(rt => rt.ExpiresOnUtc).IsRequired();
             entity.HasIndex(rt => rt.Token).IsUnique();
+        });
+
+        modelBuilder.Entity<CustomerEntity>(entity =>
+        {
+            entity.HasKey(c => c.Id);
+            entity.Property(c => c.Name).IsRequired().HasMaxLength(100);
+            entity.Property(c => c.Email).IsRequired().HasMaxLength(100);
+            entity.Property(c => c.Document).IsRequired().HasMaxLength(50);
+            entity.HasIndex(c => c.Email).IsUnique();
+            entity.HasIndex(c => c.Document).IsUnique();
         });
 
         // Relación 1-N entre Employee y Role

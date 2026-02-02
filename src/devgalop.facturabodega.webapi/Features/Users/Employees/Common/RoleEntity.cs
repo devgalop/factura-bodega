@@ -30,7 +30,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
 
         public RoleEntity(string name)
         {
-            Id = Guid.NewGuid();
+            Id = Guid.CreateVersion7();
             Name = name;
             Status = RoleStatus.ACTIVE;
             Permissions = new List<PermissionEntity>();
@@ -58,7 +58,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
 
         public PermissionEntity(string name)
         {
-            Id = Guid.NewGuid();
+            Id = Guid.CreateVersion7();
             Name = name;
             RolesAssociated = new List<RoleEntity>();
         }

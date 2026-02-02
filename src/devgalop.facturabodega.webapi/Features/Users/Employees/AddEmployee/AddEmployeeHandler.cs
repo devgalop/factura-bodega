@@ -37,6 +37,7 @@ public sealed class AddEmployeeHandler(
         var newEmployee = new EmployeeEntity(
             command.Name,
             command.Email,
+            command.Document,
             hashedPassword,
             command.HiringDate,
             command.ContractType,
@@ -47,7 +48,7 @@ public sealed class AddEmployeeHandler(
     }
 }
 
-public record AddEmployeeCommand(string Name, string Email, string Password, DateTime HiringDate, EmployeeContractType ContractType) : ICommand;
+public record AddEmployeeCommand(string Name, string Email, string Document, string Password, DateTime HiringDate, EmployeeContractType ContractType) : ICommand;
 
 public static class AddEmployeeExtensions
 {

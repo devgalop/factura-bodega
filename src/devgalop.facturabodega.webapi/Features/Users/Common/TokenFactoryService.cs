@@ -110,7 +110,8 @@ namespace devgalop.facturabodega.webapi.Features.Users.Common
             });
 
             builder.Services.AddAuthorizationBuilder()
-                .AddPolicy("AdminOnly", policy => policy.RequireClaim(ClaimTypes.Role, "ADMIN"));
+                .AddPolicy("AdminOnly", policy => policy.RequireClaim(ClaimTypes.Role, "ADMIN"))
+                .AddPolicy("FacturadorOnly", policy => policy.RequireClaim(ClaimTypes.Role, "FACTURADOR"));
             
             return builder;
         }

@@ -155,6 +155,7 @@ namespace devgalop.facturabodega.webapi.Infrastructure.Persistence
                 EmployeeEntity initialEmployee = new(
                     name: "Facundo",
                     email: sampleEmail,
+                    document: "123456789",
                     hiringDate: DateTime.UtcNow.AddYears(-1),
                     contractType: EmployeeContractType.FULL_TIME,
                     passwordHashed: hashedPassword,

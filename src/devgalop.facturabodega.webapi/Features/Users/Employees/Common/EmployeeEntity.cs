@@ -31,6 +31,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public string Document { get; set; }
         public string Email { get; private set; }
         public string PasswordHashed { get; set; }
         public DateTime HiringDate { get; set; }
@@ -48,20 +49,23 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
             Name = string.Empty;
             Email = string.Empty;
             PasswordHashed = string.Empty;
+            Document = string.Empty;
             Role = null!;
             RefreshTokens = new List<EmployeeRefreshTokenEntity>();
         }
 
         public EmployeeEntity(string name, 
                               string email,
+                              string document,
                               string passwordHashed, 
                               DateTime hiringDate, 
                               EmployeeContractType contractType,
                               RoleEntity role)
         {
-            Id = Guid.NewGuid();
+            Id = Guid.CreateVersion7();
             Name = name;
             Email = email;
+            Document = document;
             PasswordHashed = passwordHashed;
             HiringDate = hiringDate.ToUniversalTime();
             ContractType = contractType;

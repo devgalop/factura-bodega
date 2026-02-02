@@ -1,6 +1,7 @@
 
 using devgalop.facturabodega.webapi.Common;
 using devgalop.facturabodega.webapi.Features.Users.Common;
+using devgalop.facturabodega.webapi.Features.Users.Customers.Common;
 using devgalop.facturabodega.webapi.Features.Users.Employees.Common;
 using devgalop.facturabodega.webapi.Infrastructure.Persistence;
 using FluentValidation;
@@ -16,6 +17,7 @@ builder.AddDatabaseContext()
         .AddMediator()
         .AddEndpoints()
         .RegisterEmployeeFeatures()
+        .RegisterCustomerFeatures()
         .RegisterTokenFactoryService()
         .AddExceptionHandlers();
 
