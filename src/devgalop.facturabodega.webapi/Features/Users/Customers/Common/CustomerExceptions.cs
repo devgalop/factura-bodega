@@ -17,4 +17,15 @@ namespace devgalop.facturabodega.webapi.Features.Users.Customers.Common
             Document = document;
         }
     }
+
+    public class CustomerNotFoundException : Exception
+    {
+        public string Id {get;}
+
+        public CustomerNotFoundException(string id) 
+                    : base($"El cliente con Id '{id}' no se encuentra registrado en el sistema.")
+        {
+            Id = id;
+        }
+    }
 }

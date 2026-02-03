@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using devgalop.facturabodega.webapi.Features.Users.Customers.AddCustomer;
+using devgalop.facturabodega.webapi.Features.Users.Customers.EditCustomer;
 
 namespace devgalop.facturabodega.webapi.Features.Users.Customers.Common
 {
@@ -18,7 +19,8 @@ namespace devgalop.facturabodega.webapi.Features.Users.Customers.Common
         /// <returns></returns>
         public static WebApplicationBuilder RegisterCustomerFeatures(this WebApplicationBuilder builder)
         {
-            builder.RegisterAddCustomerFeature();
+            builder.RegisterAddCustomerFeature()
+                   .RegisterEditCustomerFeature();
             return builder;
         }
     }

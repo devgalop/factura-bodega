@@ -23,5 +23,14 @@ namespace devgalop.facturabodega.test.Features.Users.Employees.EditEmployee
             var result = _validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(x => x.Name); 
         }
+
+        [Fact]
+        public void Should_HaveError_When_NameExceedsMaxLength()
+        {
+            var invalidName = new string('a', 101);
+            var model = new EditEmployeeRequest("test@test.com", invalidName, "FULL_TIME", DateTime.UtcNow, "Admin", true);
+            var result = _validator.TestValidate(model);
+            result.ShouldHaveValidationErrorFor(x => x.Name);
+        }  
     }
 }
