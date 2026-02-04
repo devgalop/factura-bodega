@@ -12,9 +12,12 @@ using FluentValidation;
 
 namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee;
 
+public record AddEmployeeNotificationParams(string CustomerName) : INotificationParams;
+
 public sealed class AddEmployeeHandler(
     AppDatabaseContext dbContext, 
-    IPasswordManager<EmployeeCredentials> passwordManager) : ICommandHandler<AddEmployeeCommand>
+    IPasswordManager<EmployeeCredentials> passwordManager,
+    NotificationProvider notificationProvider) : ICommandHandler<AddEmployeeCommand>
 {
     public async Task HandleAsync(AddEmployeeCommand command)
     {
@@ -47,6 +50,13 @@ public sealed class AddEmployeeHandler(
 
         await dbContext.Employees.AddAsync(newEmployee);
         await dbContext.SaveChangesAsync();
+
+        await notificationProvider.SendAsync(new NotificationContent(
+            Subject: "Bienvenido al sistema",
+            HtmlContent: $"<p>Hola {command.Name},</p><p>Has sido registrado exitosamente como empleado.</p>",
+            Sender: new NotificationAddress("Sistema de Facturación", "devgalop@gmail.com"),
+            To: new List<NotificationAddress> { new NotificationAddress(command.Name, command.Email) }
+        ));
     }
 }
 

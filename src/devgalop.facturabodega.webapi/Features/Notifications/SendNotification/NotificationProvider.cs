@@ -3,39 +3,45 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using devgalop.facturabodega.webapi.Features.Notifications.Common;
 
 namespace devgalop.facturabodega.webapi.Features.Notifications.SendNotification
 {
-    public record NotificationProviderOptions(string ApiUrl, string ApiKey, string Domain);
+    public interface INotificationParams{}
+    public record NotificationAddress(string Name, string Email);
+    public record NotificationContent(
+        string Subject, 
+        string HtmlContent, 
+        NotificationAddress Sender, 
+        List<NotificationAddress> To);
+    
+    public record NotificationProviderOptions(string ApiUrl, string ApiKey);
+
     public sealed class NotificationProvider(NotificationProviderOptions options)
     {
-        public async Task<NotificationResponse> SendAsync(NotificationRequest request)
+        public async Task<NotificationResponse> SendAsync(NotificationContent request)
         {
             using HttpClient httpClient = new();
             httpClient.BaseAddress = new Uri(options.ApiUrl);
-            var authToken = Convert.ToBase64String(
-                Encoding.ASCII.GetBytes($"api:{options.ApiKey}")
-            );
-            httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Basic", authToken);
-            
-            var form = new FormUrlEncodedContent(new[]
-            {
-                new KeyValuePair<string, string>("from", $"Learning Devgalop <lrn_devgalop@{options.Domain}>"),
-                new KeyValuePair<string, string>("to", request.Recipient),
-                new KeyValuePair<string, string>("subject", request.Subject),
-                new KeyValuePair<string, string>("text", request.Body)
-            });
 
-            var response = await httpClient.PostAsync($"/v3/{options.Domain}/messages", form);
+            httpClient.DefaultRequestHeaders.Add("api-key", options.ApiKey);
+            string body = JsonSerializer.Serialize(request, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = false
+            });
+            StringContent content = new(body, Encoding.UTF8, "application/json");
+
+            var response = await httpClient.PostAsync("/v3/smtp/email", content);
             if (!response.IsSuccessStatusCode)
             {
                 string errorMessage = await response.Content.ReadAsStringAsync();
-                return new NotificationResponse(false, $"Error sending notification: {errorMessage}");
+                Console.WriteLine($"Error sending notification: {errorMessage}");
+                return new NotificationResponse(false, $"Error al enviar notificación: {errorMessage}");
             }
-            return new NotificationResponse(true, "Notification sent successfully.");
+            return new NotificationResponse(true, "La notificación ha sido enviada exitosamente.");
         }
     }
 
@@ -45,8 +51,7 @@ namespace devgalop.facturabodega.webapi.Features.Notifications.SendNotification
         {
             NotificationProviderOptions options = new NotificationProviderOptions(
                 ApiUrl:builder.Configuration.GetValue<string>("NotificationProvider:ApiUrl")?? throw new ArgumentNullException("NotificationProvider:ApiUrl no está configurado apropiadamente en los appsettings."),
-                ApiKey: builder.Configuration["NotificationProvider:ApiKey"] ?? throw new ArgumentNullException("NotificationProvider:ApiKey no está configurado apropiadamente en los appsettings."),
-                Domain: builder.Configuration["NotificationProvider:Domain"] ?? throw new ArgumentNullException("NotificationProvider:Domain no está configurado apropiadamente en los appsettings.")
+                ApiKey: builder.Configuration["NotificationProvider:ApiKey"] ?? throw new ArgumentNullException("NotificationProvider:ApiKey no está configurado apropiadamente en los appsettings.")
             );
             builder.Services.AddSingleton(options);
             builder.Services.AddScoped<NotificationProvider>();
