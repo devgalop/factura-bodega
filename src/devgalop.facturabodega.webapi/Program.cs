@@ -1,5 +1,6 @@
 
 using devgalop.facturabodega.webapi.Common;
+using devgalop.facturabodega.webapi.Features.Notifications.SendNotification;
 using devgalop.facturabodega.webapi.Features.Users.Common;
 using devgalop.facturabodega.webapi.Features.Users.Customers.Common;
 using devgalop.facturabodega.webapi.Features.Users.Employees.Common;
@@ -19,6 +20,7 @@ builder.AddDatabaseContext()
         .RegisterEmployeeFeatures()
         .RegisterCustomerFeatures()
         .RegisterTokenFactoryService()
+        .RegisterNotificationProvider()
         .AddExceptionHandlers();
 
 var app = builder.Build();

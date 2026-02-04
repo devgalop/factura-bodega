@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using devgalop.facturabodega.webapi.Common;
+using devgalop.facturabodega.webapi.Features.Notifications.Common;
+using devgalop.facturabodega.webapi.Features.Notifications.SendNotification;
 using devgalop.facturabodega.webapi.Features.Users.Common;
 using devgalop.facturabodega.webapi.Features.Users.Employees.Common;
 using devgalop.facturabodega.webapi.Infrastructure.Persistence;
