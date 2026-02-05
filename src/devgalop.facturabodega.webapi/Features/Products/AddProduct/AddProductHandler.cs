@@ -9,8 +9,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace devgalop.facturabodega.webapi.Features.Products.AddProduct
 {
+    /// <summary>
+    /// Comando para agregar un nuevo producto.
+    /// </summary>
+    /// <param name="Name">Nombre del producto</param>
+    /// <param name="Description">Descripción del producto</param>
+    /// <param name="UnitPrice">Precio unitario</param>
     public record AddProductCommand(string Name, string Description, float UnitPrice): ICommand;
 
+    /// <summary>
+    /// Manejador para el comando de agregar un nuevo producto.
+    /// </summary>
+    /// <param name="dbContext"></param>
     public class AddProductHandler(AppDatabaseContext dbContext) : ICommandHandler<AddProductCommand>
     {
         public async Task HandleAsync(AddProductCommand command)
@@ -30,6 +40,11 @@ namespace devgalop.facturabodega.webapi.Features.Products.AddProduct
     /// </summary>
     public static class AddProductExtensions
     {
+        /// <summary>
+        /// Registra las dependencias necesarias para la funcionalidad de agregar productos.
+        /// </summary>
+        /// <param name="builder">Builder de aplicacion</param>
+        /// <returns></returns>
         public static WebApplicationBuilder RegisterAddProductFeature(this WebApplicationBuilder builder)
         {
             builder.Services.AddScoped<ICommandHandler<AddProductCommand>, AddProductHandler>();

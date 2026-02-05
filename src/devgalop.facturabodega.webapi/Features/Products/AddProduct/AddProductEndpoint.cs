@@ -7,11 +7,24 @@ using FluentValidation;
 
 namespace devgalop.facturabodega.webapi.Features.Products.AddProduct
 {
-
+    /// <summary>
+    /// Solicitud para agregar un nuevo producto.
+    /// </summary>
+    /// <param name="Name">Nombre del producto</param>
+    /// <param name="Description">Descripcion del producto</param>
+    /// <param name="Price">Precio unitario</param>
     public record AddProductRequest(string Name, string Description, float Price);
 
+    /// <summary>
+    /// Respuesta después de agregar un nuevo producto.
+    /// </summary>
+    /// <param name="IsSuccessful">Resultado de proceso</param>
+    /// <param name="Message">Mensaje descriptivo</param>
     public record AddProductResponse(bool IsSuccessful, string Message);
 
+    /// <summary>
+    /// Endpoint para agregar un nuevo producto.
+    /// </summary>
     public class AddProductEndpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder app)
@@ -29,10 +42,25 @@ namespace devgalop.facturabodega.webapi.Features.Products.AddProduct
                     request.Price
                 ));
                 return Results.Json(new AddProductResponse(true, "Producto agregado exitosamente."), statusCode: 201);
-            });
+            })
+            .RequireAuthorization(["AdminOnly"])
+            .WithName("AddProduct")
+            .WithSummary("Agregar Producto")
+            .WithDescription(""" 
+                Agrega un nuevo producto al sistema con la información proporcionada.
+                - `Name`: Nombre del producto.
+                - `Description`: Descripcion del producto.
+                - `Price`: Precio unitario.
+            """)
+            .Produces<AddProductResponse>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesValidationProblem();;
         }
     }
 
+    /// <summary>
+    /// Validador para la solicitud de agregar un producto.
+    /// </summary>
     public sealed class AddProductRequestValidator : AbstractValidator<AddProductRequest>
     {
         public AddProductRequestValidator()
