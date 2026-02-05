@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using devgalop.facturabodega.webapi.Features.Products.Common;
 using devgalop.facturabodega.webapi.Features.Users.Customers.Common;
 using devgalop.facturabodega.webapi.Features.Users.Employees.Common;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,8 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
     public DbSet<PermissionEntity> Permissions { get; set; }
     public DbSet<EmployeeRefreshTokenEntity> RefreshTokens { get; set; }
     public DbSet<CustomerEntity> Customers { get; set; }
+    public DbSet<ProductEntity> Products { get; set; }
+    public DbSet<ProductStockEntity> ProductStocks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -65,6 +68,25 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
             entity.Property(c => c.Document).IsRequired().HasMaxLength(50);
             entity.HasIndex(c => c.Email).IsUnique();
             entity.HasIndex(c => c.Document).IsUnique();
+        });
+
+        modelBuilder.Entity<ProductEntity>(entity =>
+        {
+            entity.HasKey(p => p.Id);
+            entity.Property(p => p.Name).IsRequired().HasMaxLength(150);
+            entity.Property(p => p.Description).HasMaxLength(500);
+            entity.Property(p => p.UnitPrice).IsRequired();
+            entity.HasIndex(p => p.Name).IsUnique();
+        });
+
+        modelBuilder.Entity<ProductStockEntity>(entity =>
+        {
+            entity.HasKey(ps => ps.Id);
+            entity.Property(ps => ps.Quantity).IsRequired();
+            entity.HasOne(ps => ps.Product)
+                  .WithMany()
+                  .HasForeignKey(ps => ps.ProductId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         // Relación 1-N entre Employee y Role
