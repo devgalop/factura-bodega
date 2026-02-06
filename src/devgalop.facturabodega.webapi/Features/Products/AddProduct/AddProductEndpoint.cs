@@ -43,7 +43,7 @@ namespace devgalop.facturabodega.webapi.Features.Products.AddProduct
                 ));
                 return Results.Json(new AddProductResponse(true, "Producto agregado exitosamente."), statusCode: 201);
             })
-            .RequireAuthorization(["AdminOnly"])
+            .RequireAuthorization("CanCreateProduct")
             .WithName("AddProduct")
             .WithSummary("Agregar Producto")
             .WithDescription(""" 
@@ -54,7 +54,7 @@ namespace devgalop.facturabodega.webapi.Features.Products.AddProduct
             """)
             .Produces<AddProductResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
-            .ProducesValidationProblem();;
+            .ProducesValidationProblem();
         }
     }
 

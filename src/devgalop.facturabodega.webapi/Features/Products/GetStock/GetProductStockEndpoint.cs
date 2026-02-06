@@ -7,7 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace devgalop.facturabodega.webapi.Features.Products.GetStock
 {
+    /// <summary>
+    /// Respuesta al obtener el stock de un producto específico.
+    /// </summary>
+    /// <param name="IsSuccessful">Resultado del proceso</param>
+    /// <param name="Message">Mensaje descriptivo</param>
+    /// <param name="Stock">Cantidad disponible</param>
     public record GetStockResponse(bool IsSuccessful, string Message, int Stock);
+
     /// <summary>
     /// Endpoint para obtener el stock disponible de un producto específico utilizando su identificador.
     /// </summary>
@@ -33,7 +40,7 @@ namespace devgalop.facturabodega.webapi.Features.Products.GetStock
 
                 return Results.Ok(new GetStockResponse(true, $"El stock del producto con ID '{productId}' es {result.Stock}.", result.Stock));
             })
-            .RequireAuthorization(["AdminOnly","FacturadorOnly"])
+            .RequireAuthorization("CanListProducts")
             .WithName("GetStock")
             .WithSummary("Obtener Inventario de Producto")
             .WithDescription(""" 

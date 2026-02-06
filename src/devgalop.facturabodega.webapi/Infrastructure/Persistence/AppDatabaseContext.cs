@@ -77,6 +77,10 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
             entity.Property(p => p.Description).HasMaxLength(500);
             entity.Property(p => p.UnitPrice).IsRequired();
             entity.HasIndex(p => p.Name).IsUnique();
+            entity.HasOne(p => p.Stock)
+                  .WithOne(ps => ps.Product)
+                  .HasForeignKey<ProductStockEntity>(ps => ps.ProductId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<ProductStockEntity>(entity =>
@@ -84,8 +88,8 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
             entity.HasKey(ps => ps.Id);
             entity.Property(ps => ps.Quantity).IsRequired();
             entity.HasOne(ps => ps.Product)
-                  .WithMany()
-                  .HasForeignKey(ps => ps.ProductId)
+                  .WithOne(ps => ps.Stock)
+                  .HasForeignKey<ProductEntity>(ps => ps.StockId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 

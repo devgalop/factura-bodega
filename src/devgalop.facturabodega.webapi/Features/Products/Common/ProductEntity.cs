@@ -12,11 +12,15 @@ namespace devgalop.facturabodega.webapi.Features.Products.Common
         public string Description { get; set; }
         public float UnitPrice { get; set; }
 
+        public Guid StockId { get; set; }
+        public ProductStockEntity Stock { get; set; }
+
         public ProductEntity()
         {
             Name = string.Empty;
             Description = string.Empty;
             UnitPrice = 0;
+            Stock = new ProductStockEntity();
         }
 
         public ProductEntity(string name, string description, float price)
@@ -25,6 +29,7 @@ namespace devgalop.facturabodega.webapi.Features.Products.Common
             Name = name;
             Description = description;
             UnitPrice = price;
+            Stock = new ProductStockEntity();
         }
     }
 

@@ -26,7 +26,7 @@ namespace devgalop.facturabodega.webapi.Features.Products.AddProduct
         public async Task HandleAsync(AddProductCommand command)
         {
             var productFound = await dbContext.Products
-                                            .FirstOrDefaultAsync(p => p.Name.Equals(command.Name, StringComparison.OrdinalIgnoreCase));
+                                            .FirstOrDefaultAsync(p => p.Name == command.Name);
             
             if(productFound != null) throw new ExistingProductException(command.Name);
             var newProduct = new ProductEntity(command.Name, command.Description, command.UnitPrice);

@@ -29,11 +29,17 @@ namespace devgalop.facturabodega.webapi.Features.Products.GetStock
     {
         public async Task<GetProductStockResponse> HandleAsync(GetProductStockQuery query)
         {
-            var productFound = await dbContext.ProductStocks
-                                            .FirstOrDefaultAsync(p => p.Id.ToString().Equals(query.ProductId, StringComparison.OrdinalIgnoreCase)) 
+            var productFound = await dbContext.Products
+                                            .Include(p => p.Stock)
+                                            .Where(p => p.Id.ToString() == query.ProductId)
+                                            .Select(ps => new GetProductStockResponse(
+                                                ps.Id.ToString(), 
+                                                ps.Stock != null ? ps.Stock.Quantity : 0
+                                            ))
+                                            .FirstOrDefaultAsync() 
                                             ?? throw new ProductNotFoundException(query.ProductId);
 
-            return new GetProductStockResponse(productFound.Id.ToString(), productFound.Quantity);
+            return productFound;
         }
     }
 
