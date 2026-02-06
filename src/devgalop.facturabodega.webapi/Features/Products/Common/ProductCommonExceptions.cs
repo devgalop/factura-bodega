@@ -14,4 +14,14 @@ namespace devgalop.facturabodega.webapi.Features.Products.Common
             Name = name;
         }
     }
+
+    public class ProductNotFoundException : Exception
+    {
+        public string ProductId {get;}
+        public ProductNotFoundException(string productId)
+            : base($"No se encontró un producto con el identificador '{productId}'.")
+        {
+            ProductId = productId;
+        }
+    }
 }
