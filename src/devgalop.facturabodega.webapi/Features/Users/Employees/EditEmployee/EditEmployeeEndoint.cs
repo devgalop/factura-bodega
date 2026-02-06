@@ -66,7 +66,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.EditEmployee
                 
                 return Results.Json(new EditEmployeeResponse(true, "Empleado editado correctamente."), statusCode: 202);
             })
-            .RequireAuthorization("AdminOnly")
+            .RequireAuthorization("CanModifyEmployee")
             .WithName("EditEmployee")
             .WithSummary("Editar información de Empleado")
             .WithDescription(""" 
@@ -79,6 +79,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.EditEmployee
                 - `IsActive`: Estado actual del empleado (true para activo, false para inactivo).
             """)
             .Produces<EditEmployeeResponse>(StatusCodes.Status202Accepted)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesValidationProblem();
         }
     }

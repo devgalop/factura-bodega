@@ -39,7 +39,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.RemoveEmployee
                     "El empleado ha sido desactivado correctamente."
                 ));
             })
-            .RequireAuthorization("AdminOnly")
+            .RequireAuthorization("CanRemoveEmployee")
             .WithName("RemoveEmployee")
             .WithSummary("Dar de baja el empleado")
             .WithDescription(""" 
@@ -47,7 +47,8 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.RemoveEmployee
                 - `EmployeeId`: Identificador del empleado.
             """)
             .Produces<RemoveEmployeeResponse>(StatusCodes.Status200OK)
-            .Produces<RemoveEmployeeResponse>(StatusCodes.Status400BadRequest);
+            .Produces<RemoveEmployeeResponse>(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status403Forbidden);
         }
     }
 }

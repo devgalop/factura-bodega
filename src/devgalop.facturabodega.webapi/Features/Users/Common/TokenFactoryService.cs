@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
@@ -109,11 +110,71 @@ namespace devgalop.facturabodega.webapi.Features.Users.Common
                 };
             });
 
-            builder.Services.AddAuthorizationBuilder()
-                .AddPolicy("AdminOnly", policy => policy.RequireClaim(ClaimTypes.Role, "ADMIN"))
-                .AddPolicy("FacturadorOnly", policy => policy.RequireClaim(ClaimTypes.Role, "FACTURADOR"));
+            builder.CreatePolicies();
             
             return builder;
+        }
+
+        public static WebApplicationBuilder CreatePolicies(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddSingleton<RolePermissionsProvider>();
+            RolePermissionsProvider rolePermissionsProvider = builder.Services.BuildServiceProvider().GetRequiredService<RolePermissionsProvider>();
+            rolePermissionsProvider.LoadPermissions();
+
+            builder.Services.AddAuthorizationBuilder()
+                            .CreatePolicy(rolePermissionsProvider, "CanCreateEmployee")
+                            .CreatePolicy(rolePermissionsProvider, "CanModifyEmployee")
+                            .CreatePolicy(rolePermissionsProvider, "CanRemoveEmployee")
+                            .CreatePolicy(rolePermissionsProvider, "CanRevokeEmployeeTokens")
+                            .CreatePolicy(rolePermissionsProvider, "CanCreateCustomer")
+                            .CreatePolicy(rolePermissionsProvider, "CanModifyCustomer")
+                            .CreatePolicy(rolePermissionsProvider, "CanRecoveryPassword")
+                            .CreatePolicy(rolePermissionsProvider, "CanRefreshToken")
+                            .CreatePolicy(rolePermissionsProvider, "CanCreateProduct")
+                            .CreatePolicy(rolePermissionsProvider, "CanEditProduct")
+                            .CreatePolicy(rolePermissionsProvider, "CanCreateInvoice")
+                            .CreatePolicy(rolePermissionsProvider, "CanCancelInvoice")
+                            .CreatePolicy(rolePermissionsProvider, "CanListCustomers")
+                            .CreatePolicy(rolePermissionsProvider, "CanListProducts")
+                            .CreatePolicy(rolePermissionsProvider, "CanListEmployees")
+                            .CreatePolicy(rolePermissionsProvider, "CanListInvoices");
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Crea una política de autorización basada en un permiso específico utilizando el RolePermissionsProvider.
+        /// </summary>
+        /// <param name="builder">Constructor de autorización</param>
+        /// <param name="provider">Proveedor de permisos por rol</param>
+        /// <param name="permissionName">Nombre del permiso</param>
+        /// <returns></returns>
+        public static AuthorizationBuilder CreatePolicy(this AuthorizationBuilder builder, RolePermissionsProvider provider, string permissionName)
+        {
+            builder.AddPolicy(permissionName, policy =>
+            {
+                policy.RequireAssertion(context =>
+                {
+                    return context.IsAuthorized(provider, permissionName);
+                });
+            });
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Verifica si el usuario tiene el permiso requerido utilizando el RolePermissionsProvider.
+        /// </summary>
+        /// <param name="context">Contexto de autorización</param>
+        /// <param name="provider">Proveedor de permisos por rol</param>
+        /// <param name="permission">Nombre del permiso</param>
+        /// <returns>Resultado validación</returns>
+        public static bool IsAuthorized(this AuthorizationHandlerContext context, RolePermissionsProvider provider,string permission)
+        {
+            var roleClaim = context.User.FindFirst(ClaimTypes.Role)?.Value;
+            if (roleClaim == null) return false;
+
+            return provider.HasPermission(roleClaim, permission);
         }
 
         /// <summary>

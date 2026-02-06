@@ -32,7 +32,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.GetEmployee
                     return Results.NotFound(new { Message = $"Empleado con Id '{employeeId}' no encontrado." });
                 }
             })
-            .RequireAuthorization("AdminOnly")
+            .RequireAuthorization("CanListEmployees")
             .WithName("GetEmployeeById")
             .WithSummary("Obtener empleado por Id")
             .WithDescription(""" 
@@ -41,6 +41,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.GetEmployee
             """)
             .Produces<GetEmployeeResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesValidationProblem();
         }
     }

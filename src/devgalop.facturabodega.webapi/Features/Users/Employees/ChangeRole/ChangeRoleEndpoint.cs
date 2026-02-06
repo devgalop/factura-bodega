@@ -40,7 +40,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.ChangeRole
                 ));
                 return Results.Json(new ChangeRoleResponse("El rol del empleado ha sido cambiado exitosamente."), statusCode: 202);
             })
-            .RequireAuthorization("AdminOnly")
+            .RequireAuthorization("CanModifyEmployee")
             .WithName("ChangeRole")
             .WithSummary("Editar el rol del Empleado")
             .WithDescription(""" 
@@ -51,6 +51,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.ChangeRole
             .Produces<ChangeRoleResponse>(StatusCodes.Status202Accepted)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesValidationProblem();
         }
     }

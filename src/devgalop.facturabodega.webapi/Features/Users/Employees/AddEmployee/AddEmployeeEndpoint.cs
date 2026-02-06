@@ -67,7 +67,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
                 
                 return Results.Json(new AddEmployeeResponse(true, "Empleado registrado en la base de datos de manera exitosa."), statusCode: 201);
             })
-            .RequireAuthorization("AdminOnly")
+            .RequireAuthorization("CanCreateEmployee")
             .WithName("AddEmployee")
             .WithSummary("Agregar Empleado")
             .WithDescription(""" 
@@ -80,6 +80,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
                 - `ContractType`: Tipo de contrato del empleado (por ejemplo, 'FULL_TIME', 'PART_TIME', 'CONTRACTOR').
             """)
             .Produces<AddEmployeeResponse>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesValidationProblem();
         }
     }

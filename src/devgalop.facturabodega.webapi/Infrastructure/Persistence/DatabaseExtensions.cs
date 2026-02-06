@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using devgalop.facturabodega.webapi.Features.Products.Common;
 using devgalop.facturabodega.webapi.Features.Users.Common;
 using devgalop.facturabodega.webapi.Features.Users.Employees.Common;
 using Microsoft.EntityFrameworkCore;
@@ -127,6 +128,22 @@ namespace devgalop.facturabodega.webapi.Infrastructure.Persistence
                 await appContext.Permissions.AddAsync(CanRecoveryPassword);
                 PermissionEntity canRefeshTokenPermission = new("CanRefreshToken");
                 await appContext.Permissions.AddAsync(canRefeshTokenPermission);
+                PermissionEntity canCreateProductPermission = new("CanCreateProduct");
+                await appContext.Permissions.AddAsync(canCreateProductPermission);
+                PermissionEntity canEditProductPermission = new("CanEditProduct");
+                await appContext.Permissions.AddAsync(canEditProductPermission);
+                PermissionEntity canCreateInvoicePermission = new("CanCreateInvoice");
+                await appContext.Permissions.AddAsync(canCreateInvoicePermission);
+                PermissionEntity canCancelInvoicePermission = new("CanCancelInvoice");
+                await appContext.Permissions.AddAsync(canCancelInvoicePermission);
+                PermissionEntity canListCustomersPermission = new("CanListCustomers");
+                await appContext.Permissions.AddAsync(canListCustomersPermission);
+                PermissionEntity canListProductsPermission = new("CanListProducts");
+                await appContext.Permissions.AddAsync(canListProductsPermission);
+                PermissionEntity canListEmployeesPermission = new("CanListEmployees");
+                await appContext.Permissions.AddAsync(canListEmployeesPermission);
+                PermissionEntity canListInvoicesPermission = new("CanListInvoices");
+                await appContext.Permissions.AddAsync(canListInvoicesPermission);
                 
 
                 // Crear rol inicial y asociar permiso
@@ -139,7 +156,25 @@ namespace devgalop.facturabodega.webapi.Infrastructure.Persistence
                 adminRole.Permissions.Add(canModifyCustomerPermission);
                 adminRole.Permissions.Add(CanRecoveryPassword);
                 adminRole.Permissions.Add(canRefeshTokenPermission);
+                adminRole.Permissions.Add(canCreateProductPermission);
+                adminRole.Permissions.Add(canEditProductPermission);
+                adminRole.Permissions.Add(canCreateInvoicePermission);
+                adminRole.Permissions.Add(canListCustomersPermission);
+                adminRole.Permissions.Add(canListEmployeesPermission);
+                adminRole.Permissions.Add(canListProductsPermission);
+                adminRole.Permissions.Add(canListInvoicesPermission);
                 await appContext.Roles.AddAsync(adminRole);
+
+                RoleEntity facturadorRole = new("Facturador");
+                facturadorRole.Permissions.Add(canCreateCustomerPermission);
+                facturadorRole.Permissions.Add(canModifyCustomerPermission);
+                facturadorRole.Permissions.Add(CanRecoveryPassword);
+                facturadorRole.Permissions.Add(canRefeshTokenPermission);
+                facturadorRole.Permissions.Add(canCreateInvoicePermission);
+                facturadorRole.Permissions.Add(canListCustomersPermission);
+                facturadorRole.Permissions.Add(canListProductsPermission);
+                facturadorRole.Permissions.Add(canListInvoicesPermission);
+                await appContext.Roles.AddAsync(facturadorRole);
 
                 RoleEntity simpleRole = new("BASIC");
                 simpleRole.Permissions.Add(CanRecoveryPassword);
@@ -163,6 +198,30 @@ namespace devgalop.facturabodega.webapi.Infrastructure.Persistence
                 );
                 await appContext.Employees.AddAsync(initialEmployee);
 
+                sampleEmail = "pepe@yopmail.com";
+                credentials = new(sampleEmail, samplePassword);
+                hashedPassword = credentialsManager.HashPassword(credentials, samplePassword);
+                EmployeeEntity facturadorEmployee = new(
+                    name: "Pepe",
+                    email: sampleEmail,
+                    document: "987654321",
+                    hiringDate: DateTime.UtcNow.AddMonths(-6),
+                    contractType: EmployeeContractType.PART_TIME,
+                    passwordHashed: hashedPassword,
+                    role: facturadorRole
+                );
+                await appContext.Employees.AddAsync(facturadorEmployee);
+
+                ProductEntity product = new("Producto de ejemplo", "Descripción del producto de ejemplo",50);
+                ProductStockEntity productStock = new()
+                {
+                    ProductId = product.Id,
+                    Quantity = 100,
+                    Product = product
+                };
+                await appContext.Products.AddAsync(product);
+                await appContext.ProductStocks.AddAsync(productStock);
+                
                 // Guardar cambios y confirmar transacción
                 await appContext.SaveChangesAsync();
                 await transaction.CommitAsync();
