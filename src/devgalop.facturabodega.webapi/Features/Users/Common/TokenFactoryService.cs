@@ -115,6 +115,11 @@ namespace devgalop.facturabodega.webapi.Features.Users.Common
             return builder;
         }
 
+        /// <summary>
+        /// Configura las políticas de autorización basadas en los permisos definidos en el RolePermissionsProvider.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
         public static WebApplicationBuilder CreatePolicies(this WebApplicationBuilder builder)
         {
             builder.Services.AddSingleton<RolePermissionsProvider>();

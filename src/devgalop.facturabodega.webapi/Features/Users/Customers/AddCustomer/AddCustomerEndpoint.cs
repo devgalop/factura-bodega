@@ -31,7 +31,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Customers.AddCustomer
                 await mediator.SendAsync(request);
                 return Results.Json(new AddCustomerResponse(true, "El cliente fue registrado en la base de datos"), statusCode:202);
             })
-            .RequireAuthorization(["AdminOnly","FacturadorOnly"])
+            .RequireAuthorization("CanCreateCustomer")
             .WithName("AddCustomer")
             .WithSummary("Agregar Cliente")
             .WithDescription(""" 

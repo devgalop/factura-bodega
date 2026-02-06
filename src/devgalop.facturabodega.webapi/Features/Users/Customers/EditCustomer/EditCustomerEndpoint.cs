@@ -24,7 +24,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Customers.EditCustomer
                 await mediator.SendAsync(request);
                 return Results.Json(new EditCustomerResponse(true, "El cliente fue actualizado en la base de datos"), statusCode: 200);
             })
-            .RequireAuthorization(["AdminOnly","FacturadorOnly"])
+            .RequireAuthorization("CanModifyCustomer")
             .WithName("EditCustomer")
             .WithSummary("Editar Cliente")
             .WithDescription(""" 
