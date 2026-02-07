@@ -54,6 +54,58 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.ChangePassword
     }
 
     /// <summary>
+    /// Comando para cambiar la contraseña de un empleado existente utilizando un token de recuperación de contraseña.
+    /// </summary>
+    /// <param name="Token">Token de recuperación</param>
+    /// <param name="NewPassword">Nueva contraseña</param>
+    public record ChangePasswordWithTokenCommand(string Token, string NewPassword) : ICommand;
+
+    /// <summary>
+    /// Handler para cambiar la contraseña de un empleado existente utilizando un token de recuperación de contraseña.
+    /// </summary>
+    /// <param name="dbContext">Contexto de base de datos</param>
+    /// <param name="passwordManager">Gestor de contraseñas</param>
+    public sealed class ChangePasswordWithTokenHandler(
+        AppDatabaseContext dbContext,
+        IPasswordManager<EmployeeCredentials> passwordManager
+    ): ICommandHandler<ChangePasswordWithTokenCommand>
+    {
+        public async Task HandleAsync(ChangePasswordWithTokenCommand command)
+        {
+            var employeeFound = await dbContext.RecoverPasswordTokens
+                                                .Include(t => t.Employee)
+                                                .FirstOrDefaultAsync(t => t.Token == command.Token)
+                                                ?? throw new ValidationException(
+                                                        [
+                                                            new ValidationFailure(
+                                                                nameof(command.Token),
+                                                                "El token de recuperación es inválido.")
+                                                        ]);
+            if(employeeFound.ExpiresOnUtc < DateTime.UtcNow) throw new ValidationException(
+                                        [
+                                            new ValidationFailure(
+                                                nameof(command.Token),
+                                                "El token de recuperación ha expirado.")
+                                        ]);
+
+            if(employeeFound.IsUsed) throw new ValidationException(
+                                        [
+                                            new ValidationFailure(
+                                                nameof(command.Token),
+                                                "El token de recuperación ya ha sido utilizado.")
+                                        ]);
+            
+            EmployeeCredentials newCredentials = new(employeeFound.Employee.Email, command.NewPassword);
+            string newHashedPassword = passwordManager.HashPassword(newCredentials, command.NewPassword);
+            employeeFound.Employee.PasswordHashed = newHashedPassword;
+            employeeFound.IsUsed = true;
+            dbContext.Employees.Update(employeeFound.Employee);
+            dbContext.RecoverPasswordTokens.Update(employeeFound);
+            await dbContext.SaveChangesAsync();
+        }
+    }
+
+    /// <summary>
     /// Extensiones para registrar el handler para cambiar la contraseña de un empleado existente en los servicios de la aplicación.
     /// </summary>
     public static class ChangePasswordExtensions
@@ -65,7 +117,8 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.ChangePassword
         /// <returns></returns>
         public static WebApplicationBuilder RegisterChangePasswordFeature(this WebApplicationBuilder builder)
         {
-            builder.Services.AddScoped<ICommandHandler<ChangePasswordCommand>, ChangePasswordHandler>();
+            builder.Services.AddScoped<ICommandHandler<ChangePasswordCommand>, ChangePasswordHandler>()
+                            .AddScoped<ICommandHandler<ChangePasswordWithTokenCommand>, ChangePasswordWithTokenHandler>();
             return builder;
         }
     }

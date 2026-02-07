@@ -89,4 +89,60 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.ChangePassword
                 .Matches(@"[\!\?\*\.\-]+").WithMessage("La contraseña debe contener al menos un simbolo (!? *.-).");
         }
     }
+
+    /// <summary>
+    /// Peticion para cambiar la contraseña de un empleado utilizando un token de recuperación.
+    /// </summary>
+    /// <param name="RecoveryToken">Token de recuperacion</param>
+    /// <param name="NewPassword">Nueva contraseña</param>
+    public record ChangePasswordWithRecoveryTokenRequest(string RecoveryToken, string NewPassword);
+
+    /// <summary>
+    /// Endpoint para cambiar la contraseña de un empleado utilizando un token de recuperación de contraseña.
+    /// </summary>
+    public sealed class ChangePasswordWithRecoveryTokenEndpoint : IEndpoint
+    {
+        public void MapEndpoint(IEndpointRouteBuilder app)
+        {
+            app.MapPut("/employees/change-password-with-token", async (
+                ChangePasswordWithRecoveryTokenRequest request,
+                IMediator mediator,
+                IValidator<ChangePasswordWithRecoveryTokenRequest> validator
+            ) =>
+            {
+                validator.ValidateAndThrow(request);
+                await mediator.SendAsync(new ChangePasswordWithTokenCommand(request.RecoveryToken, request.NewPassword));
+                return Results.Ok(new ChangePasswordResponse(true, "Contraseña cambiada exitosamente."));
+            })
+            .AllowAnonymous()
+            .WithName("ChangePasswordWithToken")
+            .WithSummary("Cambiar Contraseña Empleado con Token de Recuperación")
+            .WithDescription(""" 
+                Cambiar la contraseña de un empleado existente con un token de recuperación de contraseña
+                - 'RecoveryToken' es el token de recuperación de contraseña enviado al correo del empleado
+                - 'NewPassword' es la nueva contraseña que se desea establecer para el empleado
+            """)
+            .Produces<ChangePasswordResponse>(StatusCodes.Status200OK)
+            .ProducesValidationProblem();
+        }
+    }
+
+    public class ChangePasswordWithRecoveryTokenRequestValidator : AbstractValidator<ChangePasswordWithRecoveryTokenRequest>
+    {
+        public ChangePasswordWithRecoveryTokenRequestValidator()
+        {
+            RuleFor(x => x.RecoveryToken)
+                .NotEmpty().WithMessage("El token de recuperación es obligatorio.")
+                .MaximumLength(200).WithMessage("La longitud del token de recuperación no puede exceder 200 carácteres.");
+
+            RuleFor(x => x.NewPassword)
+                .NotEmpty().WithMessage("La contraseña es obligatoria.")
+                .MinimumLength(8).WithMessage("La contraseña debe tener almenos 8 carácteres.")
+                .MaximumLength(16).WithMessage("La longitud de la contraseña no puede exceder 16 carácteres.")
+                .Matches(@"[A-Z]+").WithMessage("La contraseña debe contener al menos una letra mayúscula.")
+                .Matches(@"[a-z]+").WithMessage("La contraseña debe contener al menos una letra minúscula.")
+                .Matches(@"[0-9]+").WithMessage("La contraseña debe contener al menos un número.")
+                .Matches(@"[\!\?\*\.\-]+").WithMessage("La contraseña debe contener al menos un simbolo (!? *.-).");
+        }
+    }
 }
