@@ -86,6 +86,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Login
                 
                 return Results.Ok(result);
             })
+            .RequireAuthorization("CanRefreshToken")
             .WithName("LoginEmployeeWithRefreshToken")
             .WithSummary("Inicio de sesión de empleado con refresh token")
             .WithDescription(""" 

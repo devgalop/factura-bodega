@@ -8,6 +8,7 @@ using devgalop.facturabodega.webapi.Features.Users.Employees.ChangeRole;
 using devgalop.facturabodega.webapi.Features.Users.Employees.EditEmployee;
 using devgalop.facturabodega.webapi.Features.Users.Employees.GetEmployee;
 using devgalop.facturabodega.webapi.Features.Users.Employees.Login;
+using devgalop.facturabodega.webapi.Features.Users.Employees.RecoveryPassword;
 using devgalop.facturabodega.webapi.Features.Users.Employees.RemoveEmployee;
 
 namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
@@ -27,7 +28,8 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
                     .RegisterChangeRoleFeature()
                     .RegisterEmployeeCredentialsManager()
                     .RegisterChangePasswordFeature()
-                    .RegisterLoginFeature();
+                    .RegisterLoginFeature()
+                    .RegisterRecoveryPasswordFeature();
                     
             return builder;
         }

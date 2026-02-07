@@ -18,6 +18,7 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
     public DbSet<CustomerEntity> Customers { get; set; }
     public DbSet<ProductEntity> Products { get; set; }
     public DbSet<ProductStockEntity> ProductStocks { get; set; }
+    public DbSet<RecoverPasswordTokenEntity> RecoverPasswordTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -91,6 +92,20 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
                   .WithOne(ps => ps.Stock)
                   .HasForeignKey<ProductEntity>(ps => ps.StockId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<RecoverPasswordTokenEntity>(entity =>
+        {
+            entity.HasKey(rpt => rpt.Id);
+            entity.Property(rpt => rpt.Token).IsRequired().HasMaxLength(200);
+            entity.Property(rpt => rpt.ExpiresOnUtc).IsRequired();
+            entity.Property(rpt => rpt.IsUsed).IsRequired();
+            entity.HasIndex(rpt => rpt.Token).IsUnique();
+
+            entity.HasOne(rpt => rpt.Employee)
+                    .WithMany()
+                    .HasForeignKey(rpt => rpt.EmployeeId)
+                    .OnDelete(DeleteBehavior.Cascade);
         });
 
         // Relación 1-N entre Employee y Role

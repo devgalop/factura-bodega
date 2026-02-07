@@ -71,6 +71,21 @@ namespace devgalop.facturabodega.webapi.Features.Users.Common
             DateTime expiration = DateTime.UtcNow.AddDays(7);
             return new TokenResult(true, refreshToken, expiration);
         }
+
+        /// <summary>
+        /// Genera un token OTP seguro con una vigencia específica.
+        /// </summary>
+        /// <param name="expirationInSeconds">Duracion del token en segundos</param>
+        /// <returns></returns>
+        public TokenResult GenerateOTPToken(int expirationInSeconds)
+        {
+            var randomNumber = new byte[32];
+            using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            string refreshToken = Convert.ToBase64String(randomNumber);
+            DateTime expiration = DateTime.UtcNow.AddSeconds(expirationInSeconds);
+            return new TokenResult(true, refreshToken, expiration);
+        }
     }
 
     public static class TokenFactoryExtensions
