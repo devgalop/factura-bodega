@@ -65,7 +65,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.GetEmployee
                 var response = await mediator.SendAsync<GetEmployeesRequest, GetEmployeesResponse>(new GetEmployeesRequest());
                 return Results.Ok(response);
             })
-            .RequireAuthorization("AdminOnly")
+            .RequireAuthorization("CanListEmployees")
             .WithName("GetEmployees")
             .WithSummary("Obtener empleados existentes")
             .WithDescription(""" 
