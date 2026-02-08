@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using devgalop.facturabodega.webapi.Features.Products.AddProduct;
+using devgalop.facturabodega.webapi.Features.Products.EditProduct;
 using devgalop.facturabodega.webapi.Features.Products.GetProducts;
 using devgalop.facturabodega.webapi.Features.Products.GetStock;
 
@@ -14,7 +15,8 @@ namespace devgalop.facturabodega.webapi.Features.Products.Common
         {
             builder.RegisterAddProductFeature()
                    .RegisterGetProductStockFeature()
-                   .RegisterGetProductsFeature();
+                   .RegisterGetProductsFeature()
+                   .RegisterEditProductFeature();
             
             return builder;
         }

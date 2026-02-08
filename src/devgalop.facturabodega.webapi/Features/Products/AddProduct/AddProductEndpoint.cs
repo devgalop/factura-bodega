@@ -54,6 +54,7 @@ namespace devgalop.facturabodega.webapi.Features.Products.AddProduct
             """)
             .Produces<AddProductResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesValidationProblem();
         }
     }
