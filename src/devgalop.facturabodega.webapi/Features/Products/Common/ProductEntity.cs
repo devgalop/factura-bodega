@@ -40,5 +40,19 @@ namespace devgalop.facturabodega.webapi.Features.Products.Common
 
         public Guid ProductId { get; set; }
         public ProductEntity? Product { get; set; }
+
+        public ProductStockEntity()
+        {
+            Quantity = 0;
+            Product = null;
+        }
+
+        public ProductStockEntity(ProductEntity product, int quantity)
+        {
+            Id = Guid.CreateVersion7();
+            ProductId = product.Id;
+            Product = product;
+            Quantity = quantity;
+        }
     }
 }
