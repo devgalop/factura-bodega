@@ -24,4 +24,14 @@ namespace devgalop.facturabodega.webapi.Features.Products.Common
             ProductId = productId;
         }
     }
+
+    public class UnassignmentStockException : Exception
+    {
+        public string ProductId {get;}
+        public UnassignmentStockException(string productId)
+            : base($"No se puede actualizar el stock del producto con identificador '{productId}' porque no tiene un registro de stock asociado.")
+        {
+            ProductId = productId;
+        }
+    }
 }

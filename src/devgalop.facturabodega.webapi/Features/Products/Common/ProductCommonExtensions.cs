@@ -7,6 +7,7 @@ using devgalop.facturabodega.webapi.Features.Products.AddProductToStock;
 using devgalop.facturabodega.webapi.Features.Products.EditProduct;
 using devgalop.facturabodega.webapi.Features.Products.GetProducts;
 using devgalop.facturabodega.webapi.Features.Products.GetStock;
+using devgalop.facturabodega.webapi.Features.Products.UpdateStock;
 
 namespace devgalop.facturabodega.webapi.Features.Products.Common
 {
@@ -18,7 +19,8 @@ namespace devgalop.facturabodega.webapi.Features.Products.Common
                    .RegisterGetProductStockFeature()
                    .RegisterGetProductsFeature()
                    .RegisterEditProductFeature()
-                   .RegisterAddProductStockFeature();
+                   .RegisterAddProductStockFeature()
+                   .RegisterUpdateStockFeature();
             
             return builder;
         }
