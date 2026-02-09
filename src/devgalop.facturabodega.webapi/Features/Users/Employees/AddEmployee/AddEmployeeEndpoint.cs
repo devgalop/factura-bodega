@@ -112,6 +112,10 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
                 .Matches(@"[a-z]+").WithMessage("La contraseña debe contener al menos una letra minúscula.")
                 .Matches(@"[0-9]+").WithMessage("La contraseña debe contener al menos un número.")
                 .Matches(@"[\!\?\*\.\-]+").WithMessage("La contraseña debe contener al menos un simbolo (!? *.-).");
+
+            RuleFor(x => x.Document)
+                .NotEmpty().WithMessage("El número de documento es obligatorio.")
+                .MaximumLength(50).WithMessage("El documento no puede exceder los 50 caracteres.");
         }
 
         private bool BeInPast(DateTime date)
