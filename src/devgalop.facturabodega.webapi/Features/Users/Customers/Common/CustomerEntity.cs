@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using devgalop.facturabodega.webapi.Features.Invoices.Common;
 
 namespace devgalop.facturabodega.webapi.Features.Users.Customers.Common
 {
@@ -16,11 +17,14 @@ namespace devgalop.facturabodega.webapi.Features.Users.Customers.Common
         public string Email { get; set; }
         public string Document { get; set; }
 
+        public ICollection<InvoiceEntity> Invoices { get; set; }
+
         public CustomerEntity()
         {
             Name = string.Empty;
             Email = string.Empty;
             Document = string.Empty;
+            Invoices = [];
         }
 
         public CustomerEntity(string name, string email, string document)
@@ -29,6 +33,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Customers.Common
             Name = name;
             Email = email;
             Document = document;
+            Invoices = [];
         }
     }
 }

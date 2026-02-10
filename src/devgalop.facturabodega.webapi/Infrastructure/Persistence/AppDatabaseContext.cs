@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using devgalop.facturabodega.webapi.Features.Invoices.Common;
 using devgalop.facturabodega.webapi.Features.Products.Common;
 using devgalop.facturabodega.webapi.Features.Users.Customers.Common;
 using devgalop.facturabodega.webapi.Features.Users.Employees.Common;
@@ -19,6 +20,8 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
     public DbSet<ProductEntity> Products { get; set; }
     public DbSet<ProductStockEntity> ProductStocks { get; set; }
     public DbSet<RecoverPasswordTokenEntity> RecoverPasswordTokens { get; set; }
+    public DbSet<InvoiceEntity> Invoices { get; set; }
+    public DbSet<InvoiceDetailEntity> InvoiceDetails { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -106,6 +109,35 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
                     .WithMany()
                     .HasForeignKey(rpt => rpt.EmployeeId)
                     .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<InvoiceEntity>(entity =>
+        {
+            entity.HasKey(i => i.Id);
+            entity.Property(i => i.DateOnUtc).IsRequired();
+            entity.Property(i => i.ClientId).IsRequired();
+            entity.HasOne(i => i.Client)
+                  .WithMany(c => c.Invoices)
+                  .HasForeignKey(i => i.ClientId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<InvoiceDetailEntity>(entity =>
+        {
+            entity.HasKey(id => id.Id);
+            entity.Property(id => id.Quantity).IsRequired();
+            entity.Property(id => id.ProductId).IsRequired();
+            entity.Property(id => id.InvoiceId).IsRequired();
+
+            entity.HasOne(id => id.Product)
+                  .WithMany()
+                  .HasForeignKey(id => id.ProductId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(id => id.Invoice)
+                  .WithMany(i => i.Details)
+                  .HasForeignKey(id => id.InvoiceId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         // Relación 1-N entre Employee y Role
