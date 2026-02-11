@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Diagnostics;
 
 namespace devgalop.facturabodega.webapi.Middlewares
 {
-    public sealed class ValidationExceptionHandler(IProblemDetailsService problemDetailsService) : IExceptionHandler
+    public sealed class ValidationExceptionHandler(IProblemDetailsService problemDetailsService, ILogger<ValidationExceptionHandler> logger) : IExceptionHandler
     {
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext,
                                                 Exception exception, 
@@ -17,7 +17,7 @@ namespace devgalop.facturabodega.webapi.Middlewares
             {
                 return false;
             }
-
+            logger.LogError("Ocurrieron errores de validación: {@Exception}", exception);
             httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
             var context = new ProblemDetailsContext
             {

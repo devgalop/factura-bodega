@@ -6,12 +6,13 @@ using Microsoft.AspNetCore.Diagnostics;
 
 namespace devgalop.facturabodega.webapi.Middlewares
 {
-    public sealed class GlobalExceptionHandler(IProblemDetailsService problemDetailsService) : IExceptionHandler
+    public sealed class GlobalExceptionHandler(IProblemDetailsService problemDetailsService, ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
     {
         public ValueTask<bool> TryHandleAsync(HttpContext httpContext, 
                                                 Exception exception, 
                                                 CancellationToken cancellationToken)
         {
+            logger.LogError(exception, "Ocurrió una excepción no controlada: {Message}", exception.Message);
             return problemDetailsService.TryWriteAsync(new ProblemDetailsContext
             {
                 HttpContext = httpContext,

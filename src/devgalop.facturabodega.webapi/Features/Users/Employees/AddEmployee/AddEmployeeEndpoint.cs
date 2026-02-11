@@ -42,8 +42,10 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
             app.MapPost("/employees/add", async (
                     AddEmployeeRequest request, 
                     IMediator mediator,
-                    IValidator<AddEmployeeRequest> validator) =>
+                    IValidator<AddEmployeeRequest> validator,
+                    ILogger<AddEmployeeEndpoint> logger) =>
             {
+                logger.LogInformation("Recibiendo solicitud para agregar un nuevo empleado: {Email}", request.Email);
                 validator.ValidateAndThrow(request);
 
                 if(!Enum.TryParse(
@@ -56,6 +58,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
                                                                         "El tipo de contrato proporcionado no es válido.")
                                                                 ]);
 
+                logger.LogInformation("Agregando nuevo empleado al sistema: {Email}", request.Email);
                 await mediator.SendAsync(new AddEmployeeCommand(
                     request.Name,
                     request.Email,
@@ -64,7 +67,7 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee
                     request.HiringDate,
                     Enum.Parse<EmployeeContractType>(request.ContractType)
                 ));
-                
+                logger.LogInformation("Empleado agregado exitosamente: {Email}", request.Email);
                 return Results.Json(new AddEmployeeResponse(true, "Empleado registrado en la base de datos de manera exitosa."), statusCode: 201);
             })
             .RequireAuthorization("CanCreateEmployee")
