@@ -1,5 +1,6 @@
 
 using devgalop.facturabodega.webapi.Common;
+using devgalop.facturabodega.webapi.Features.Invoices.Common;
 using devgalop.facturabodega.webapi.Features.Notifications.SendNotification;
 using devgalop.facturabodega.webapi.Features.Products.Common;
 using devgalop.facturabodega.webapi.Features.Users.Common;
@@ -27,6 +28,7 @@ try
             .RegisterEmployeeFeatures()
             .RegisterCustomerFeatures()
             .RegisterProductFeatures()
+            .RegisterInvoiceFeature()
             .RegisterTokenFactoryService()
             .RegisterNotificationProvider()
             .AddExceptionHandlers();

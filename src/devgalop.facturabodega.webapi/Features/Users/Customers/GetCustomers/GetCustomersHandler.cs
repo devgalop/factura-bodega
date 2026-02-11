@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using devgalop.facturabodega.webapi.Common;
+using devgalop.facturabodega.webapi.Features.Users.Customers.Common;
 using devgalop.facturabodega.webapi.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace devgalop.facturabodega.webapi.Features.Users.Customers.GetCustomers
 {
@@ -23,11 +25,25 @@ namespace devgalop.facturabodega.webapi.Features.Users.Customers.GetCustomers
         }
     }
 
+    public record GetCustomerQuery(string Id):IQuery;
+    
+    public sealed class GetCustomerHandler(AppDatabaseContext dbContext): IQueryHandler<GetCustomerQuery, GetCustomerDetail>
+    {
+        public async Task<GetCustomerDetail> HandleAsync(GetCustomerQuery query)
+        {
+            var customer = await dbContext.Customers
+                                        .FirstOrDefaultAsync(c => c.Id.ToString() == query.Id)
+                                        ?? throw new CustomerNotFoundException(query.Id);
+            return new GetCustomerDetail(customer.Id.ToString(), customer.Name);
+        }
+    }
+
     public static class GetCustomersExtensions
     {
         public static WebApplicationBuilder RegisterGetCustomersFeature(this WebApplicationBuilder builder)
         {
-            builder.Services.AddScoped<IQueryHandler<GetCustomersQuery, GetCustomersResponse>, GetCustomersHandler>();
+            builder.Services.AddScoped<IQueryHandler<GetCustomersQuery, GetCustomersResponse>, GetCustomersHandler>()
+                            .AddScoped<IQueryHandler<GetCustomerQuery, GetCustomerDetail>, GetCustomerHandler>();
             return builder;
         }
     }

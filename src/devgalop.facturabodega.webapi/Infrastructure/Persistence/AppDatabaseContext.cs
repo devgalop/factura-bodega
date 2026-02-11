@@ -120,6 +120,12 @@ public class AppDatabaseContext(DbContextOptions<AppDatabaseContext> options) : 
                   .WithMany(c => c.Invoices)
                   .HasForeignKey(i => i.ClientId)
                   .OnDelete(DeleteBehavior.Cascade);
+                  
+            entity.Property(i => i.EmployeeId).IsRequired();
+            entity.HasOne(i => i.Employee)
+                  .WithMany()
+                  .HasForeignKey(i => i.EmployeeId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<InvoiceDetailEntity>(entity =>
