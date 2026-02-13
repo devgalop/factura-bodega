@@ -94,6 +94,14 @@ namespace devgalop.facturabodega.webapi.Features.Invoices.CreateInvoice
             //TODO: Crear la factura y sus detalles
             dbContext.Invoices.Add(invoice);
             dbContext.InvoiceDetails.AddRange(invoiceDetails);
+
+            //TODO: Actualizar el stock de los productos facturados
+            foreach (InvoiceDetailEntity detail in invoiceDetails)
+            {
+                detail.Product.Stock.Quantity -= detail.Quantity;
+                dbContext.ProductStocks.Update(detail.Product.Stock);
+            }
+
             await dbContext.SaveChangesAsync();
         }
     }
