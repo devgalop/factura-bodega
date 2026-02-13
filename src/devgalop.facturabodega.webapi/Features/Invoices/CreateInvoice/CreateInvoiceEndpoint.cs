@@ -7,22 +7,39 @@ using FluentValidation;
 
 namespace devgalop.facturabodega.webapi.Features.Invoices.CreateInvoice
 {
-
+    /// <summary>
+    /// Detalles de la factura
+    /// </summary>
+    /// <param name="ProductId">Identificador del producto</param>
+    /// <param name="Quantity">Cantidad facturada</param>
     public record CreateInvoiceDetailRequest(
         string ProductId,
         int Quantity
     );
 
+    /// <summary>
+    /// Peticion para crear una factura
+    /// </summary>
+    /// <param name="ClientId">Identificador del cliente</param>
+    /// <param name="EmployeeId">Identificador del empleado</param>
+    /// <param name="Details">Detalles facturados</param>
     public record CreateInvoiceRequest(
         string ClientId,
         string EmployeeId,
         IEnumerable<CreateInvoiceDetailRequest> Details
     );
 
+    /// <summary>
+    /// Respuesta al crear una factura
+    /// </summary>
+    /// <param name="Message">Mensaje descriptivo</param>
     public record CreateInvoiceResponse(
         string Message
     );
 
+    /// <summary>
+    /// Endpoint para crear una factura
+    /// </summary>
     public sealed class CreateInvoiceEndpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder app)
@@ -57,6 +74,9 @@ namespace devgalop.facturabodega.webapi.Features.Invoices.CreateInvoice
         }
     }
 
+    /// <summary>
+    /// Validador para la peticion de crear una factura
+    /// </summary>
     public sealed class CreateInvoiceValidator : AbstractValidator<CreateInvoiceRequest>
     {
         public CreateInvoiceValidator()
@@ -70,6 +90,9 @@ namespace devgalop.facturabodega.webapi.Features.Invoices.CreateInvoice
         }
     }
 
+    /// <summary>
+    /// Validador para los detalles de la factura
+    /// </summary>
     public sealed class CreateInvoiceDetailValidator : AbstractValidator<CreateInvoiceDetailRequest>
     {
         public CreateInvoiceDetailValidator()

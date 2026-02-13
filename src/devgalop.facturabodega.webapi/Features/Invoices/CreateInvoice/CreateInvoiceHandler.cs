@@ -13,13 +13,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace devgalop.facturabodega.webapi.Features.Invoices.CreateInvoice
 {
+    /// <summary>
+    /// Comando para crear una factura
+    /// </summary>
+    /// <param name="ClientId">Identificador del cliente</param>
+    /// <param name="EmployeeId">Identificador del empleado</param>
+    /// <param name="Details">Detalles facturados</param>
     public record CreateInvoiceCommand(
         string ClientId,
         string EmployeeId,
         IEnumerable<CreateInvoiceDetailRequest> Details
     ) : ICommand;
 
-
+    /// <summary>
+    /// Manejador para el comando de crear una factura
+    /// </summary>
+    /// <param name="dbContext"></param>
     public sealed class CreateInvoiceHandler(
         AppDatabaseContext dbContext
     ) : ICommandHandler<CreateInvoiceCommand>
@@ -89,8 +98,16 @@ namespace devgalop.facturabodega.webapi.Features.Invoices.CreateInvoice
         }
     }
 
+    /// <summary>
+    /// Extensiones para registrar la funcionalidad de crear una factura
+    /// </summary>
     public static class CreateInvoiceExtensions
     {
+        /// <summary>
+        /// Registra la funcionalidad de crear una factura
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
         public static WebApplicationBuilder RegisterCreateInvoiceFeature(this WebApplicationBuilder builder)
         {
             builder.Services.AddScoped<ICommandHandler<CreateInvoiceCommand>, CreateInvoiceHandler>();
