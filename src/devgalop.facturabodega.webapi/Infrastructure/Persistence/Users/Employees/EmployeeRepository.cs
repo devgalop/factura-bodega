@@ -79,4 +79,23 @@ namespace devgalop.facturabodega.webapi.Infrastructure.Persistence.Users.Employe
             await dbContext.SaveChangesAsync();
         }
     }
+
+    public static class EmployeeRepositoryExtensions
+    {
+        /// <summary>
+        /// Agrega dependencias para el acceso a datos para un empleado.
+        /// </summary>
+        /// <param name="builder">Constructor de aplicacion</param>
+        /// <returns>Constructor de aplicacion</returns>
+        public static WebApplicationBuilder AddEmployeeRepository(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddScoped<ICreateEmployeeRepository, EmployeeRepository>();
+            builder.Services.AddScoped<IGetEmployeeRepository, EmployeeRepository>();
+            builder.Services.AddScoped<IEditEmployeeRepository, EmployeeRepository>();
+            builder.Services.AddScoped<IRemoveEmployeeRepository, EmployeeRepository>();
+
+            return builder;
+        }
+        
+    }
 }

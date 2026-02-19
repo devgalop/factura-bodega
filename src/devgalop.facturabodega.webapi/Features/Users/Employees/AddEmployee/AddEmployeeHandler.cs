@@ -15,13 +15,15 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.AddEmployee;
 public record AddEmployeeNotificationParams(string CustomerName) : INotificationParams;
 
 public sealed class AddEmployeeHandler(
-    AppDatabaseContext dbContext, 
+    IGetEmployeeRepository getEmployeeRepository,
+    ICreateEmployeeRepository createEmployeeRepository, 
+    IGetRoleRepository getRoleRepository,
     IPasswordManager<EmployeeCredentials> passwordManager,
     NotificationProvider notificationProvider) : ICommandHandler<AddEmployeeCommand>
 {
     public async Task HandleAsync(AddEmployeeCommand command)
     {
-        bool isAlreadyRegistered = dbContext.Employees.Where(e => e.Email == command.Email).Any();
+        bool isAlreadyRegistered = await getEmployeeRepository.GetEmployeeByEmail(command.Email) != null;
         if(isAlreadyRegistered)
         {
             throw new ValidationException(
@@ -32,9 +34,7 @@ public sealed class AddEmployeeHandler(
                 ]);
         }
         
-        var role = dbContext.Roles
-            .Where(r => r.Name == "BASIC")
-            .FirstOrDefault() ?? throw new Exception("El rol no se encontró en la base de datos.");
+        var role = await getRoleRepository.GetRoleByName("BASIC") ?? throw new Exception("El rol no se encontró en la base de datos.");
             
         EmployeeCredentials credentials = new(command.Email, command.Password);
         string hashedPassword = passwordManager.HashPassword(credentials, command.Password);
@@ -48,8 +48,7 @@ public sealed class AddEmployeeHandler(
             command.ContractType,
             role);
 
-        await dbContext.Employees.AddAsync(newEmployee);
-        await dbContext.SaveChangesAsync();
+        await createEmployeeRepository.CreateEmployee(newEmployee);
 
         await notificationProvider.SendAsync(new NotificationContent(
             Subject: "Bienvenido al sistema",

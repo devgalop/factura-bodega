@@ -10,6 +10,8 @@ using devgalop.facturabodega.webapi.Features.Users.Employees.GetEmployee;
 using devgalop.facturabodega.webapi.Features.Users.Employees.Login;
 using devgalop.facturabodega.webapi.Features.Users.Employees.RecoveryPassword;
 using devgalop.facturabodega.webapi.Features.Users.Employees.RemoveEmployee;
+using devgalop.facturabodega.webapi.Infrastructure.Persistence.Users.Employees;
+using devgalop.facturabodega.webapi.Infrastructure.Persistence.Users.Roles;
 
 namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
 {
@@ -21,6 +23,9 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
         /// <param name="builder">builder de aplicación</param>
         public static WebApplicationBuilder RegisterEmployeeFeatures(this WebApplicationBuilder builder)
         {
+            builder.AddEmployeeRepository()
+                    .AddRoleRepository();
+
             builder.RegisterAddEmployeeFeature()
                     .RegisterEditEmployeeFeature()
                     .RegisterGetEmployeeFeatures()
