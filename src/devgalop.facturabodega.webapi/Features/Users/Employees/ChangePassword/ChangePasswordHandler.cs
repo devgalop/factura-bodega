@@ -63,18 +63,18 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.ChangePassword
     /// <summary>
     /// Handler para cambiar la contraseña de un empleado existente utilizando un token de recuperación de contraseña.
     /// </summary>
-    /// <param name="dbContext">Contexto de base de datos</param>
+    /// <param name="getEmployeeRepository">Repositorio para obtener empleados</param>
+    /// <param name="editEmployeeRepository">Repositorio para editar empleados</param>
     /// <param name="passwordManager">Gestor de contraseñas</param>
     public sealed class ChangePasswordWithTokenHandler(
-        AppDatabaseContext dbContext,
+        IGetEmployeeRepository getEmployeeRepository,
+        IEditEmployeeRepository editEmployeeRepository,
         IPasswordManager<EmployeeCredentials> passwordManager
     ): ICommandHandler<ChangePasswordWithTokenCommand>
     {
         public async Task HandleAsync(ChangePasswordWithTokenCommand command)
         {
-            var employeeFound = await dbContext.RecoverPasswordTokens
-                                                .Include(t => t.Employee)
-                                                .FirstOrDefaultAsync(t => t.Token == command.Token)
+            var employeeFound = await getEmployeeRepository.GetRecoverPasswordToken(command.Token)
                                                 ?? throw new ValidationException(
                                                         [
                                                             new ValidationFailure(
@@ -98,10 +98,8 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.ChangePassword
             EmployeeCredentials newCredentials = new(employeeFound.Employee.Email, command.NewPassword);
             string newHashedPassword = passwordManager.HashPassword(newCredentials, command.NewPassword);
             employeeFound.Employee.PasswordHashed = newHashedPassword;
-            employeeFound.IsUsed = true;
-            dbContext.Employees.Update(employeeFound.Employee);
-            dbContext.RecoverPasswordTokens.Update(employeeFound);
-            await dbContext.SaveChangesAsync();
+            await editEmployeeRepository.EditRecoveryToken(employeeFound);
+            await editEmployeeRepository.EditEmployee(employeeFound.Employee);
         }
     }
 

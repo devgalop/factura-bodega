@@ -53,6 +53,13 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
         /// </summary>
         /// <returns>Lista de empleados</returns>
         Task<List<EmployeeEntity>> GetInactiveEmployees();
+
+        /// <summary>
+        /// Obtiene un token de recuperación de contraseña por su valor.
+        /// </summary>
+        /// <param name="token">Token a validar</param>
+        /// <returns>Token de recuperacion</returns>
+        Task<RecoverPasswordTokenEntity?> GetRecoverPasswordToken(string token); 
     }
 
     public interface IEditEmployeeRepository
@@ -63,6 +70,13 @@ namespace devgalop.facturabodega.webapi.Features.Users.Employees.Common
         /// <param name="employee">Entidad</param>
         /// <returns></returns>
         Task EditEmployee(EmployeeEntity employee);
+
+        /// <summary>
+        /// Edita estado de token de recuperación de contraseña existente en la base de datos.
+        /// </summary>
+        /// <param name="token">token</param>
+        /// <returns></returns>
+        Task EditRecoveryToken(RecoverPasswordTokenEntity token);
     }
 
     public interface IRemoveEmployeeRepository

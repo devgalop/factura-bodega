@@ -21,6 +21,13 @@ namespace devgalop.facturabodega.webapi.Infrastructure.Persistence.Users.Employe
             await dbContext.SaveChangesAsync();
         }
 
+        public async Task EditRecoveryToken(RecoverPasswordTokenEntity token)
+        {
+            token.IsUsed = true;
+            dbContext.RecoverPasswordTokens.Update(token);
+            await dbContext.SaveChangesAsync();
+        }
+
         public async Task<List<EmployeeEntity>> GetActiveEmployees()
         {
             var activeEmployees = await dbContext.Employees
@@ -70,6 +77,14 @@ namespace devgalop.facturabodega.webapi.Infrastructure.Persistence.Users.Employe
                 .Where(e => e.Status == EmployeeStatus.INACTIVE)
                 .ToListAsync();
             return inactiveEmployees;
+        }
+
+        public async Task<RecoverPasswordTokenEntity?> GetRecoverPasswordToken(string token)
+        {
+            var recoverToken = await dbContext.RecoverPasswordTokens
+                .Include(t => t.Employee)
+                .FirstOrDefaultAsync(t => t.Token == token);
+            return recoverToken;
         }
 
         public async Task RemoveEmployee(EmployeeEntity employee)
