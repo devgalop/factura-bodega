@@ -19,7 +19,7 @@ public sealed class AddEmployeeHandler(
     ICreateEmployeeRepository createEmployeeRepository, 
     IGetRoleRepository getRoleRepository,
     IPasswordManager<EmployeeCredentials> passwordManager,
-    NotificationProvider notificationProvider) : ICommandHandler<AddEmployeeCommand>
+    INotificationProvider notificationProvider) : ICommandHandler<AddEmployeeCommand>
 {
     public async Task HandleAsync(AddEmployeeCommand command)
     {
@@ -34,7 +34,7 @@ public sealed class AddEmployeeHandler(
                 ]);
         }
         
-        var role = await getRoleRepository.GetRoleByName("BASIC") ?? throw new Exception("El rol no se encontró en la base de datos.");
+        var role = await getRoleRepository.GetRoleByName("BASIC") ?? throw new EmployeeRoleNotFoundException("BASIC");
             
         EmployeeCredentials credentials = new(command.Email, command.Password);
         string hashedPassword = passwordManager.HashPassword(credentials, command.Password);
@@ -54,12 +54,28 @@ public sealed class AddEmployeeHandler(
             Subject: "Bienvenido al sistema",
             HtmlContent: $"<p>Hola {command.Name},</p><p>Has sido registrado exitosamente como empleado.</p>",
             Sender: new NotificationAddress("Sistema de Facturación", "devgalop@gmail.com"),
-            To: new List<NotificationAddress> { new NotificationAddress(command.Name, command.Email) }
+            To: [new NotificationAddress(command.Name, command.Email)]
         ));
     }
 }
 
-public record AddEmployeeCommand(string Name, string Email, string Document, string Password, DateTime HiringDate, EmployeeContractType ContractType) : ICommand;
+/// <summary>
+/// Comando para agregar un nuevo empleado
+/// </summary>
+/// <param name="Name">Nombre del empleado</param>
+/// <param name="Email">Correo electrónico del empleado</param>
+/// <param name="Document">Documento del empleado</param>
+/// <param name="Password">Contraseña</param>
+/// <param name="HiringDate">Fecha de contratación</param>
+/// <param name="ContractType">Tipo de contrato</param>
+public record AddEmployeeCommand(
+    string Name, 
+    string Email, 
+    string Document, 
+    string Password, 
+    DateTime HiringDate, 
+    EmployeeContractType ContractType
+) : ICommand;
 
 public static class AddEmployeeExtensions
 {

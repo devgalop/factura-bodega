@@ -19,7 +19,12 @@ namespace devgalop.facturabodega.webapi.Features.Notifications.SendNotification
     
     public record NotificationProviderOptions(string ApiUrl, string ApiKey);
 
-    public sealed class NotificationProvider(NotificationProviderOptions options)
+    public interface INotificationProvider
+    {
+        Task<NotificationResponse> SendAsync(NotificationContent request);
+    }
+
+    public sealed class BrevoNotificationProvider(NotificationProviderOptions options): INotificationProvider
     {
         public async Task<NotificationResponse> SendAsync(NotificationContent request)
         {
@@ -54,7 +59,7 @@ namespace devgalop.facturabodega.webapi.Features.Notifications.SendNotification
                 ApiKey: builder.Configuration["NotificationProvider:ApiKey"] ?? throw new ArgumentNullException("NotificationProvider:ApiKey no está configurado apropiadamente en los appsettings.")
             );
             builder.Services.AddSingleton(options);
-            builder.Services.AddScoped<NotificationProvider>();
+            builder.Services.AddScoped<INotificationProvider, BrevoNotificationProvider>();
             return builder;
         }
     }
